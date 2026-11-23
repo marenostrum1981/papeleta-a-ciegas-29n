@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Test a ciegas para las elecciones generales del 29 de noviembre de 2026 en Baleares: puntúa medidas sin saber de qué partido son y descubre tu afinidad.">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Papeleta a ciegas 29N</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una sola columna tipo papeleta; cabecera fija con progreso, tarjetas de una medida, revelación con contraste, pactos y simulador */
+:root{
+  --bg:#eef1f4; --paper:#ffffff; --ink:#16202e; --muted:#5a6475; --line:#d5dbe3;
+  --accent:#1d5e7a; --accent-soft:#e1edf2;
+  --neg:#a6463a; --neg-soft:#f6e3df; --pos:#2a6f4f; --pos-soft:#dfefe6; --mid:#8a93a3; --warn:#8a5a12; --warn-soft:#f6ecd9;
+  --f-display:"Archivo Narrow","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --paper:#171e28; --ink:#e6ebf2; --muted:#9aa5b6; --line:#2a3443;
+  --accent:#6fb3d0; --accent-soft:#1b2c37;
+  --neg:#e08a7c; --neg-soft:#3a2420; --pos:#7cc4a0; --pos-soft:#1c3328; --mid:#7b8597; --warn:#e2b46a; --warn-soft:#352a17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --paper:#171e28; --ink:#e6ebf2; --muted:#9aa5b6; --line:#2a3443;
+  --accent:#6fb3d0; --accent-soft:#1b2c37;
+  --neg:#e08a7c; --neg-soft:#3a2420; --pos:#7cc4a0; --pos-soft:#1c3328; --mid:#7b8597; --warn:#e2b46a; --warn-soft:#352a17; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:720px;margin:0 auto}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.bar-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:18px;white-space:nowrap;background:none;border:0;color:var(--ink);padding:0;cursor:pointer}
+.brand span{color:var(--accent)}
+.prog{flex:1;min-width:0;display:flex;gap:3px}
+.prog i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.prog i.done{background:var(--accent)}
+.prog i.cur{background:var(--ink)}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,7vw,44px);line-height:1.05;font-weight:700}
+h2{font-size:26px;font-weight:700;line-height:1.1}
+h3{font-size:19px;font-weight:600}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{font-family:var(--f-body);font-size:17px;max-width:62ch}
+.muted{color:var(--muted)}
+section.view{display:flex;flex-direction:column;gap:18px;padding-top:24px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.steps div{min-width:0}
+.steps b{font-family:var(--f-display);font-size:16px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--paper)}
+.btn{font:600 15px var(--f-ui);border-radius:8px;padding:11px 18px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.mode{text-align:left;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.mode b{font-family:var(--f-display);font-size:18px}
+.mode[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.topic-head{display:flex;flex-direction:column;gap:8px}
+.weight{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:500 13px var(--f-ui);background:var(--paper);color:var(--ink);border:0;padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card.rated{border-color:var(--mid)}
+.card .num{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
+.card .txt{font-family:var(--f-body);font-size:17px;line-height:1.5;margin:0}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.scale button{font:500 12px var(--f-ui);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:6px;padding:8px 2px;cursor:pointer;line-height:1.2;min-width:0}
+.scale button .v{display:block;font-family:var(--f-mono);font-size:15px;font-weight:500}
+.scale button[data-v="-2"][aria-pressed="true"],.scale button[data-v="-1"][aria-pressed="true"]{background:var(--neg-soft);border-color:var(--neg);color:var(--neg)}
+.scale button[data-v="0"][aria-pressed="true"]{background:var(--line);border-color:var(--mid)}
+.scale button[data-v="1"][aria-pressed="true"],.scale button[data-v="2"][aria-pressed="true"]{background:var(--pos-soft);border-color:var(--pos);color:var(--pos)}
+.tools{display:flex;flex-wrap:wrap;gap:14px}
+.link{font:500 13px var(--f-ui);background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+textarea,input[type=text],input[type=number]{width:100%;font:15px var(--f-ui);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px}
+textarea{min-height:70px;resize:vertical}
+.ask{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:10px 12px;font-size:14px;white-space:pre-wrap;min-width:0;overflow-wrap:anywhere}
+.ask .who{font-family:var(--f-mono);font-size:11px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px}
+.who-decides{font-size:13px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.who-decides b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rank{display:flex;flex-direction:column;gap:10px}
+.rk{display:grid;grid-template-columns:minmax(0,170px) 1fr 52px;gap:10px;align-items:center}
+.rk .nm{font-family:var(--f-display);font-weight:600;font-size:16px;line-height:1.15;min-width:0}
+.rk .nm small{display:block;font-family:var(--f-ui);font-weight:400;font-size:11px;color:var(--muted)}
+.track{position:relative;height:16px;background:var(--bg);border-radius:4px;border:1px solid var(--line)}
+.track::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--mid)}
+.fill{position:absolute;top:0;bottom:0;border-radius:3px}
+.fill.ghost{opacity:.28}
+.sc{font-family:var(--f-mono);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.axis{display:grid;grid-template-columns:minmax(0,170px) 1fr 52px;gap:10px;font-family:var(--f-mono);font-size:10px;color:var(--muted)}
+.axis div{display:flex;justify-content:space-between}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;font-size:13px;min-width:680px;width:100%}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;font-variant-numeric:tabular-nums}
+th{font-family:var(--f-display);font-weight:600;font-size:13px}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--paper)}
+.cell-pos{color:var(--pos);font-weight:600}.cell-neg{color:var(--neg);font-weight:600}
+.reveal{display:flex;flex-direction:column;gap:10px}
+.rv{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--paper);display:flex;flex-direction:column;gap:6px}
+.rv .top{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.pty{font-family:var(--f-display);font-weight:700;font-size:16px}
+.tag{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted)}
+.score-pill{font-family:var(--f-mono);font-size:12px;border-radius:4px;padding:2px 8px}
+.p-pos{background:var(--pos-soft);color:var(--pos)}.p-neg{background:var(--neg-soft);color:var(--neg)}.p-0{background:var(--line);color:var(--ink)}.p-na{background:var(--bg);color:var(--muted)}
+.rv p{margin:0;font-family:var(--f-body);font-size:15px}
+.rv .cm{font-size:14px;color:var(--muted);font-style:italic}
+a{color:var(--accent);overflow-wrap:anywhere}
+.rv a{font-size:13px}
+details>summary{cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px;padding:4px 0}
+.note{font-size:13px;color:var(--muted);max-width:68ch;margin:0}
+.facts{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.facts a{font-size:12px}
+.party-box{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.party-box:first-child{border-top:0;padding-top:0}
+.flag{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:8px 10px;font-size:13px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 90px 44px;gap:6px 10px;align-items:center;font-size:14px}
+.sim input{padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums}
+.sim .seats{font-family:var(--f-mono);font-size:15px;text-align:right}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:8px;font-size:14px;z-index:20}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+footer{max-width:720px;margin:32px auto 0;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:520px){
+  .rk,.axis{grid-template-columns:minmax(0,108px) 1fr 44px}
+  .scale button{font-size:10.5px}
+  .card .txt{font-size:16px}
+}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .2s}}
+</style>
+
+<header class="bar"><div class="bar-in">
+  <button class="brand" id="home" aria-label="Volver al inicio">Papeleta <span>a ciegas</span></button>
+  <div class="prog" id="prog" aria-hidden="true"></div>
+  <div class="count" id="count"></div>
+</div></header>
+
+<main class="wrap" id="app"></main>
+<footer class="wrap">Herramienta independiente, hecha por un votante con ayuda de Claude (IA de Anthropic). No está vinculada a ningún partido ni pide el voto para nadie. Medidas actualizadas el 23 de noviembre de 2026 con los programas del 29N (<a href="https://github.com/jynus/programas-electorales-29n-generales-2026" target="_blank" rel="noopener">textos verificados</a>); contrasta siempre con los programas oficiales. No incluye encuestas.</footer>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ================= DATOS ================= */
+const UPDATED="23 de noviembre de 2026";
+// Orden alfabético para no favorecer a nadie
+const PARTIES={
+  ara:{n:"Ara Més–Front Ampli",f:"Ara Més + Sumar + IU · Carme Gomila"},
+  fo:{n:"Frente Obrero",f:"Selva Lucía Belmaña"},
+  pcte:{n:"PCTE",f:"Partido Comunista de los Trabajadores"},
+  pp:{n:"PP",f:"José Vicente Marí Bosó"},
+  psoe:{n:"PSOE",f:"PSIB-PSOE · Francina Armengol"},
+  salf:{n:"SALF",f:"Se Acabó La Fiesta · Daniel Rodríguez"},
+  vox:{n:"Vox",f:"Maribel Cerezo"}
+};
+const PKEYS=Object.keys(PARTIES);
+const KIND={
+  "29N":"Programa del 29N",
+  C26:"Anunciado en 2026",
+  P23:"Programa de 2023",
+  F26:"Programa político 2026 (no electoral)",
+  A26:"Programa autonómico 2026",
+  G:"Acción de gobierno",
+  L:"Programa de lucha 2023-2027",
+  V25:"Presentación del partido (oct. 2025)",
+  D:"Declaraciones o votaciones"
+};
+const SRC={
+  vox29:["Programa de Vox para el 29N «Es sentido común» (PDF)","https://www.voxespana.es/wp-content/uploads/2026/11/Programa-completo-A5-1.pdf"],
+  salf29:["Contrato electoral de SALF para el 29N (PDF)","https://www.seacabolafiesta.com/SALF_Contrato_Electoral_29N.pdf"],
+  psoe29:["Programa del PSOE para el 29N «La fuerza de la gente» (PDF)","https://www.psoe.es/media-content/2026/11/PROGRAMAPSOE29N26.pdf"],
+  fa29:["Programa de Frente Amplio para el 29N «Un programa como una casa» (PDF)","https://frenteamplio.info/pdf/ProgramaFrenteAmplio.pdf"],
+  fo29:["Programa de Frente Obrero para el 29N «Recuperar España» (PDF)","https://frenteobrero.es/documentos/programa-frente-obrero.pdf"],
+  pp29:["Programa del PP para el 29N «Reconstrucción Nacional» (PDF)","https://www.pp.es/wp-content/uploads/2026/11/PROGRAMA-ELECTORAL-PP-2026-RECONSTRUCCION-NACIONAL.pdf"],
+  txt29:["Textos de los programas del 29N convertidos y verificados (GitHub, jynus)","https://github.com/jynus/programas-electorales-29n-generales-2026"],
+  pp26:["Programa del PP «La Reconstrucción Nacional», resumen en Demócrata (10-nov-2026)","https://www.democrata.es/elecciones-generales-espana/programa-electoral-pp-29n-propuestas/"],
+  ppPC:["Papeleta Clara: PP, con páginas del programa 2026","https://papeletaclara.es/partidos/pp/"],
+  ppDef:["Vozpópuli: ley de programación de la Defensa del PP","https://www.vozpopuli.com/defensa/el-pp-aprobara-una-ley-de-programacion-de-la-defensa-y-dara-prioridad-a-drones-antidrones-defensa-antiaerea-y-municion.html"],
+  ppPens:["elDiario.es: Feijóo y las pensiones con el IPC (19-oct-2026)","https://www.eldiario.es/1_cf78e6"],
+  psoeQP:["Qué Proponen: PSOE, propuestas 2026 y programa 2023","https://queproponen.es/partidos/psoe"],
+  psoePC:["Papeleta Clara: PSOE, posiciones con fuente","https://papeletaclara.es/partidos/psoe/"],
+  psoeSan:["Redacción Médica: compromisos sanitarios del PSOE (7-nov-2026)","https://www.redaccionmedica.com/politica/20261107/el-psoe-se-compromete-destinar-el-del-pib-sanidad-garantizar-citas-en-primaria-menos-de-horas/364618_0.html"],
+  psoeJus:["INAP: ampliación de plazas de jueces y fiscales (ene-2026)","https://laadministracionaldia.inap.es/noticia.asp?id=1519358"],
+  voxQP:["Qué Proponen: Vox, propuestas 2026","https://queproponen.es/partidos/vox"],
+  voxPC:["Papeleta Clara: Vox, programa 2023 y posiciones","https://papeletaclara.es/partidos/vox/"],
+  voxDem:["Demócrata: Vox propone IVA al 18 % y revisar subvenciones (4-nov-2026)","https://www.democrata.es/economia/vox-propone-bajar-el-iva-al-18-recortar-cotizaciones-y-revisar-52-000-millones-en-subvenciones/"],
+  voxMon:["Moncloa.com: propuestas económicas de Vox y PP (16-oct-2026)","https://www.moncloa.com/2026/10/16/propuestas-economicas-vox-pp-29n-3449552/"],
+  faPC:["Papeleta Clara: Frente Amplio (programa de Sumar 2023 y posiciones 2026)","https://papeletaclara.es/partidos/sumar/"],
+  araAlq:["Última Hora: Ara Més-Front Ampli y el tope automático del alquiler (9-nov-2026)","https://www.ultimahora.es/noticias/elecciones-29n/2026/11/09/2746157/ara-mes-front-ampli-propone-tope-precios-del-alquiler-sea-automatico-cuando-territorio-este-tensionado.html"],
+  araAli:["Última Hora: Ara Més-Front Ampli y los alimentos básicos (7-nov-2026)","https://www.ultimahora.es/noticias/elecciones-29n/2026/11/07/2745205/ara-mes-front-ampli-propone-topar-precios-alimentos-basicos-gravar-beneficios-excesivos-distribuidores-1.html"],
+  araCand:["Diario de Marratxí: presentación de la candidatura de Ara Més-Front Ampli","https://www.diariodemarratxi.com/ara-mes-front-ampli-pone-la-vivienda-y-la-masificacion-turistica-en-el-centro-de-su-candidatura-al-congreso/"],
+  faTax:["Demócrata: Colau y el impuesto a grandes patrimonios (5-nov-2026)","https://www.democrata.es/economia/colau-plantea-gravar-a-los-ultrarricos-y-subir-impuestos-a-banca-y-grandes-empresas/"],
+  faExp:["Demócrata: Frente Amplio y la expropiación a fondos (nov-2026)","https://www.democrata.es/actualidad/frente-amplio-promete-expropiar-viviendas-fondos-buitre-elevar-impuestos-grandes-fortunas/"],
+  salfV:["El Independiente: presentación de SALF para las generales (12-oct-2025)","https://www.elindependiente.com/espana/2025/10/12/alvise-arranca-su-carrera-a-las-generales-apostando-por-deportaciones-masivas-y-un-referendum-de-salida-de-la-ue/amp/"],
+  salfPC:["Papeleta Clara: SALF (programas autonómicos 2026 y declaraciones)","https://papeletaclara.es/partidos/salf/"],
+  salfAnd:["Ground News / elDiario.es: Alvise y sus condiciones a Vox en Andalucía","https://ground.news/article/alvise-will-not-run-for-elections-in-andalusia-if-vox-accepts-five-conditions"],
+  foPC:["Papeleta Clara: Frente Obrero (programa político 2026)","https://papeletaclara.es/partidos/fo/"],
+  foWiki:["Wikipedia: Frente Obrero","https://en.wikipedia.org/wiki/Workers%27_Front_(Spain)"],
+  pcteP:["PCTE: Programa de lucha 2023-2027 (PDF)","https://www.pcte.es/wp-content/uploads/2023/07/PROGRAMA%20DE%20LUCHA%202023-2027.pdf"],
+  pcteIA:["IA en Crudo: candidatura del PCTE el 29-N","https://elecciones.iaencrudo.es/partidos/pcte"],
+  trib:["Qué Proponen: casos en los tribunales, misma regla para todos","https://queproponen.es/tribunales.html"],
+  inv:["El Español: investidura de Sánchez en 2023","https://www.elespanol.com/elecciones/generales/"],
+  bal23:["Wikipedia: circunscripción de Baleares, resultados de 2023","https://en.wikipedia.org/wiki/Balearic_Islands_(Congress_of_Deputies_constituency)"]
+};
+const TOPICS=[
+ {id:"viv",n:"Vivienda"},
+ {id:"eco",n:"Economía, impuestos y empleo"},
+ {id:"pen",n:"Pensiones"},
+ {id:"san",n:"Sanidad y educación"},
+ {id:"inm",n:"Inmigración"},
+ {id:"seg",n:"Seguridad ciudadana"},
+ {id:"jus",n:"Justicia"},
+ {id:"cor",n:"Corrupción, instituciones y Administración"},
+ {id:"igu",n:"Igualdad, violencia de género y cuotas"},
+ {id:"vid",n:"Aborto y eutanasia"},
+ {id:"ene",n:"Energía"},
+ {id:"ter",n:"Territorio, turismo y medio ambiente"},
+ {id:"ext",n:"Exterior, defensa y Unión Europea"}
+];
+// [tema, partido, exprés(1/0), tipo, fuente, quién lo decide / viabilidad, medida]
+const RAW=[
+["viv","ara",1,"C26","araAlq","Reforma de la ley estatal de vivienda","Aplicar de forma automática el tope al precio del alquiler en cuanto una zona cumpla los requisitos de mercado tensionado, sin esperar a que lo pida la comunidad autónoma."],
+["viv","ara",0,"C26","araCand","Ley estatal; para compradores de la UE la limita el Derecho europeo","Limitar la compra de vivienda en Baleares por personas que no residen en las islas."],
+["viv","ara",0,"29N","fa29","Ley estatal; encaje con la libertad de empresa y de capitales discutido","Prohibir por ley comprar vivienda para algo que no sea vivir en ella o alquilarla a precio asequible."],
+["viv","ara",0,"29N","fa29","Ley estatal; la expropiación exige indemnización (art. 33 de la Constitución)","Expropiar, con indemnización, las viviendas de propietarios corporativos con más de 1.000 pisos."],
+["viv","ara",0,"29N","fa29","Ley estatal; las licencias turísticas las dan comunidades y consells","Extinguir en tres años las licencias de pisos turísticos en edificios residenciales."],
+["viv","fo",1,"29N","fo29","Presupuestos; gestión sobre todo autonómica","Construir vivienda pública de calidad y actuar contra la especulación de bancos, fondos y grandes rentistas."],
+["viv","fo",0,"29N","fo29","Ley estatal","Paralizar los desahucios de familias trabajadoras vulnerables hasta que tengan alternativa habitacional."],
+["viv","fo",0,"29N","fo29","Comunidades y ayuntamientos regulan el uso turístico","Frenar el auge de los pisos turísticos y la gentrificación."],
+["viv","fo",0,"29N","fo29","Encaje con la igualdad del art. 14 de la Constitución discutido","Orientar el acceso a la vivienda pública hacia la población de origen español."],
+["viv","pcte",1,"L","pcteP","Choca con el art. 33 de la Constitución: exigiría reforma constitucional","Expropiar sin indemnización las viviendas vacías de bancos y fondos para alojar a familias."],
+["viv","pcte",0,"L","pcteP","Ley estatal","Prohibir todos los desahucios de familias trabajadoras y los cortes de suministros básicos."],
+["viv","pcte",0,"L","pcteP","Ley estatal","Limitar los alquileres de forma real, a costa del beneficio del propietario."],
+["viv","pp",1,"29N","pp29","Estado, con comunidades y ayuntamientos (suelo y licencias son suyos)","Construir un millón de viviendas en la legislatura, con una nueva ley del suelo y licencias resueltas en tres meses como máximo."],
+["viv","pp",0,"29N","pp29","Ley estatal","Derogar la ley de vivienda, incluidas las zonas tensionadas y los índices de referencia del precio del alquiler."],
+["viv","pp",0,"29N","pp29","Ley estatal","IVA del 4 % en la compra de la primera vivienda para menores de 40 años, con avales públicos de hasta el 20 % del precio."],
+["viv","pp",0,"29N","pp29","Ley estatal (procesal)","Que el propietario recupere su vivienda ocupada ilegalmente en 48 horas por orden judicial."],
+["viv","psoe",1,"29N","psoe29","Presupuestos y la entidad estatal Casa 47; el suelo y las licencias dependen de comunidades y ayuntamientos","Construir o comprar 100.000 viviendas para un parque público estatal de alquiler y venta a precio asequible."],
+["viv","psoe",0,"29N","psoe29","Presupuestos; convertirla en derecho fundamental exige la reforma constitucional más exigente (art. 168)","Dedicar cada año el 1 % del PIB a vivienda y reformar la Constitución para que sea un derecho fundamental exigible."],
+["viv","psoe",0,"29N","psoe29","Ley estatal","Un impuesto progresivo a los grandes propietarios y fondos por las viviendas vacías, turísticas o alquiladas a precio abusivo."],
+["viv","psoe",0,"29N","psoe29","Ley estatal; en Baleares ya existe el impuesto de turismo sostenible autonómico","Permitir a los ayuntamientos cobrar un recargo por noche en los pisos turísticos."],
+["viv","psoe",0,"29N","psoe29","Ley procesal y medios judiciales","Seguir con los juicios rápidos contra la ocupación ilegal y dar más medios a los juzgados de guardia."],
+["viv","salf",1,"29N","salf29","IVA: ley estatal. Transmisiones y actos jurídicos: tributos cedidos a las comunidades. Coste según el partido: unos 5.000 M€ al año","Una ley que garantice que la primera vivienda cueste al menos un 35 % menos: cero impuestos de compra, licencia en plazo y suelo público gratis."],
+["viv","salf",0,"29N","salf29","Ley estatal (procesal y penal)","Desalojo policial de la ocupación en 48 horas y desahucio del inquilino que no paga en 30 días, sin excepción por vulnerabilidad."],
+["viv","salf",0,"29N","salf29","Ley de Haciendas Locales; según el partido, los ayuntamientos perderían unos 13.400 M€ al año","Eliminar del todo el IBI, sin compensar a los ayuntamientos."],
+["viv","salf",0,"29N","salf29","Presupuestos (aval de 2.000 M€ según el partido)","Aval público del 20 % de la entrada para los menores de 40 años en su primera vivienda."],
+["viv","salf",0,"29N","salf29","Ley estatal","Que las SOCIMI con más de 100 pisos en alquiler paguen el 25 % de Sociedades."],
+["viv","vox",1,"29N","vox29","IVA y deducción en IRPF: ley estatal. Transmisiones: tributo cedido que fijan las comunidades","IVA del 0 % en la compra de la primera vivienda nueva, transmisiones bonificadas al 100 % y volver a deducir la vivienda habitual en el IRPF."],
+["viv","vox",0,"29N","vox29","Ley estatal","Derogar la Ley de Vivienda, incentivar el alquiler de larga duración y regular los pisos turísticos."],
+["viv","vox",0,"29N","vox29","Ley estatal (procesal y penal)","Desalojar las ocupaciones ilegales en menos de 24 horas y tratar como estafa al inquilino que deja de pagar a sabiendas."],
+["viv","vox",0,"29N","vox29","Ley estatal; su encaje con la igualdad del art. 14 de la Constitución y el Derecho de la UE está discutido","Preferencia para los españoles en la vivienda pública y prohibir alquilar a extranjeros en situación irregular."],
+["viv","vox",0,"29N","vox29","Ley estatal; para compradores de la UE lo limita el Derecho europeo","Impuestos disuasorios a la compra de vivienda por extranjeros no comunitarios y por fondos de inversión."],
+["eco","ara",1,"29N","fa29","Ley estatal","Que los patrimonios de más de un millón paguen al menos un 2 % y los de más de 50 millones, un 3 % anual."],
+["eco","ara",0,"C26","araAli","Ley estatal","Un precio máximo para los alimentos básicos frescos y de temporada."],
+["eco","ara",0,"C26","araAli","Ley estatal","Un impuesto sobre los márgenes excesivos de las grandes distribuidoras de alimentos."],
+["eco","ara",0,"29N","fa29","Ley estatal","Un tipo mínimo real del 20 % en el impuesto de sociedades para los grandes grupos."],
+["eco","ara",0,"29N","fa29","Ley estatal","Limitar las herencias a 10 millones por heredero, con un tipo del 100 % por encima."],
+["eco","fo",1,"29N","fo29","Ley estatal (IRPF)","Bajar el IRPF a quien menos gana y subirlo a las rentas altas, con más tramos."],
+["eco","fo",0,"29N","fo29","Ley estatal","Derogar las reformas que abarataron el despido y prohibir las empresas de trabajo temporal."],
+["eco","fo",0,"29N","fo29","Ley estatal con indemnización (arts. 33 y 128 de la Constitución)","Nacionalizar los sectores estratégicos de la economía."],
+["eco","pcte",1,"L","pcteP","Ley estatal","Jornada máxima de 35 horas semanales sin bajar salario y cinco semanas de vacaciones pagadas."],
+["eco","pcte",0,"L","pcteP","Ley estatal","Prohibir las empresas de trabajo temporal y poner todas las barreras posibles al despido."],
+["eco","pcte",0,"L","pcteP","Ley estatal","Precios mínimos garantizados para los agricultores y precios máximos para los consumidores."],
+["eco","pp",1,"29N","pp29","Ley estatal (IRPF)","Que quien cobre el salario mínimo no pague IRPF por ley y actualizar la tarifa del impuesto con la inflación."],
+["eco","pp",0,"29N","pp29","Ley estatal (IRPF)","Rebajar el IRPF a los jóvenes de 18 a 35 años en sus cuatro primeras declaraciones: 100 %, 75 %, 50 % y 25 %."],
+["eco","pp",0,"29N","pp29","Ley estatal (IVA)","IVA del 0 % en alimentos básicos, incluidas carne, pescado y conservas, mientras dure la inflación."],
+["eco","pp",0,"C26","pp26","Ley estatal","Sustituir el ingreso mínimo vital y otros subsidios por una única renta ligada a la búsqueda de empleo."],
+["eco","psoe",1,"29N","psoe29","Ley estatal","Fijar por ley el salario mínimo por encima del 60 % del salario medio, sin que se lo coman los complementos."],
+["eco","psoe",0,"29N","psoe29","Ley estatal","Completar la reducción de la jornada a 37,5 horas sin perder sueldo."],
+["eco","psoe",0,"29N","psoe29","Ley estatal","Más impuestos a las grandes tecnológicas y a la inteligencia artificial, y reforzar el impuesto a las transacciones financieras."],
+["eco","psoe",0,"29N","psoe29","Ley estatal (IRPF)","Convertir el mínimo por hijo del IRPF en un pago que cobren también los hogares que no hacen la declaración."],
+["eco","psoe",0,"29N","psoe29","Ley estatal (IRPF)","Una deducción en el IRPF que se active cuando suban los precios, pensada para rentas medias y bajas."],
+["eco","salf",1,"29N","salf29","Ley estatal (IRPF). Coste según el partido: unos 43.000 M€ al año en 2030","Que nadie pague IRPF por los primeros 35.000 € al año, y 5.000 € más libres por cada hijo."],
+["eco","salf",0,"29N","salf29","Ley estatal (Seguridad Social). Coste según el partido: unos 12.000 M€ al año","Eliminar del todo y para siempre la cuota de autónomos."],
+["eco","salf",0,"29N","salf29","Ley estatal; son tributos cedidos a las comunidades","Suprimir los impuestos de Sucesiones, Donaciones y Patrimonio."],
+["eco","salf",0,"29N","salf29","Ley estatal","Un contrato único indefinido con indemnización creciente y «mochila austriaca» que el trabajador se lleva al cambiar de empleo."],
+["eco","salf",0,"29N","salf29","Ley estatal; su encaje con la libertad de empresa y el Derecho de la UE no está estudiado","Que los bancos que absorbieron las cajas rescatadas devuelvan 4.700 M€ al año durante 15 años."],
+["eco","vox",1,"29N","vox29","Ley estatal (IRPF e IVA, dentro de la directiva europea)","Simplificar y bajar el IRPF, con un tipo más bajo por cada hijo, y bajar el IVA general y el reducido."],
+["eco","vox",0,"29N","vox29","Ley estatal (Seguridad Social)","Cuota cero para los autónomos que ganen menos del salario mínimo y, por encima, cuotas progresivas desde 50 €."],
+["eco","vox",0,"29N","vox29","Ley estatal","Derogar la legislación laboral aprobada por los gobiernos de Sánchez."],
+["eco","vox",0,"29N","vox29","Ley estatal; las comunidades y ayuntamientos regulan buena parte de los trámites","Derogar tres normas por cada una nueva, acabar con la cita previa y que el silencio de la Administración sea positivo."],
+["pen","ara",1,"29N","fa29","Ley estatal","Devolver la edad de jubilación a los 65 años."],
+["pen","ara",0,"29N","fa29","Ley estatal y Presupuestos","Subir las pensiones más bajas y las no contributivas por encima de la media."],
+["pen","fo",1,"29N","fo29","Ley estatal","Revertir el retraso de la edad de jubilación."],
+["pen","fo",0,"29N","fo29","Ley estatal","Calcular la pensión con los mejores años cotizados."],
+["pen","pcte",1,"L","pcteP","Ley estatal; coste muy elevado no calculado","Adelantar la jubilación a los 60 años en general y a los 55 en trabajos especialmente duros."],
+["pen","pp",1,"29N","ppPC","Ley estatal (ya vigente desde 2021)","Subir las pensiones cada año con el IPC y reconstruir el consenso del Pacto de Toledo."],
+["pen","pp",0,"29N","ppPC","Ley estatal (IRPF)","Deducciones fiscales para quien siga trabajando después de la edad de jubilación."],
+["pen","pp",0,"29N","pp29","Ley estatal y Presupuestos","Que el Estado pague el 50 % del coste de la dependencia y una deducción del 40 % por contratar cuidados profesionales para un mayor dependiente."],
+["pen","psoe",1,"29N","psoe29","Reforma constitucional (art. 50, procedimiento ordinario)","Blindar en la Constitución las pensiones públicas y su subida con el IPC."],
+["pen","psoe",0,"29N","psoe29","Ley estatal y Presupuestos","Reducir la brecha de género en las pensiones."],
+["pen","salf",1,"29N","salf29","Ley estatal; transición de décadas con doble coste (unos 6.000 M€ al año según el partido)","Sistema mixto: los menores de 45 años apartarían el 2 % del salario en una cuenta individual, suya y heredable."],
+["pen","salf",0,"29N","salf29","Reforma constitucional y ley estatal","Subida de las pensiones con el IPC garantizada en la Constitución y pensión mínima de 1.000 € con 35 años cotizados."],
+["pen","salf",0,"29N","salf29","Ley estatal","Suprimir las ventajas en la pensión de los parlamentarios y las cesantías y escoltas vitalicios de los expresidentes."],
+["pen","vox",1,"29N","vox29","Política económica general; el programa no concreta cambios en la ley de pensiones","Garantizar las pensiones con más empleo, mejores salarios y medidas de natalidad, sin detallar cambios en el sistema."],
+["pen","vox",0,"C26","voxMon","Ley estatal; transición de décadas con doble coste","Pasar a un sistema mixto en el que el reparto actual conviva con cuentas de capitalización individual."],
+["pen","vox",0,"29N","vox29","Ley estatal (Seguridad Social) y Presupuestos","Que el Estado pague la cotización de quien deja de trabajar para cuidar a sus hijos, y escuela de 0 a 3 años gratis."],
+["san","ara",1,"29N","fa29","Presupuestos y ley estatal; la gestión es autonómica","Gasto sanitario público del 8 % del PIB y gestión pública directa como norma, revirtiendo privatizaciones."],
+["san","ara",0,"29N","fa29","Ley estatal","Atención sanitaria universal para los residentes, sea cual sea su situación administrativa."],
+["san","fo",1,"29N","fo29","Exigiría reformar los estatutos de autonomía","Acabar con la privatización de la sanidad y que el sistema de salud vuelva a ser estatal."],
+["san","fo",0,"29N","fo29","Ley estatal y Presupuestos","Educación gratuita en todos los niveles, sin subvenciones a la escuela privada."],
+["san","pcte",1,"L","pcteP","Ley estatal y comunidades","Sacar a todas las empresas privadas de la sanidad, la educación y los servicios sociales."],
+["san","pcte",0,"L","pcteP","Ley estatal y Presupuestos","Incluir el dentista completo en la sanidad pública."],
+["san","pp",1,"29N","pp29","La sanidad la gestionan las comunidades; el Estado financia y forma especialistas","Incorporar al menos 4.500 médicos más en atención primaria."],
+["san","pp",0,"29N","pp29","Presupuestos y comunidades","Educación infantil de 0 a 3 años gratuita al final de la legislatura."],
+["san","pp",0,"29N","pp29","Ley estatal con las comunidades","Una única prueba de acceso a la universidad para toda España."],
+["san","pp",0,"29N","pp29","Ley estatal; aplicarla a plataformas extranjeras depende también de la UE","Prohibir las cuentas en redes sociales a menores de 14 años."],
+["san","psoe",1,"29N","psoe29","Presupuestos del Estado y de las comunidades","Acabar con las listas de espera con un gasto sanitario público en torno al 7 % del PIB."],
+["san","psoe",0,"29N","psoe29","Ley estatal; la gestión es autonómica","Que la gestión pública directa sea la forma preferente en la sanidad, limitando la privatización."],
+["san","psoe",0,"29N","psoe29","Estado y comunidades","Universalizar la escuela de 0 a 3 años con más plazas públicas y menos alumnos por aula."],
+["san","salf",1,"29N","salf29","Gestión autonómica; coste según el partido: unos 1.500 M€ al año","Máximo de 60 días para operarse; si no, el paciente elige centro, público o privado, y paga la sanidad pública."],
+["san","salf",0,"29N","salf29","Ley estatal; hoy cada comunidad compra por su cuenta","Una central de compras sanitaria única para toda España."],
+["san","salf",0,"29N","salf29","Ley estatal; hoy la cobertura es universal para residentes","Tarjeta sanitaria solo para españoles y residentes legales con cotización o cobertura, con urgencias para todos."],
+["san","salf",0,"29N","salf29","Estado y comunidades","Un cheque escolar del mismo importe para la pública, la concertada y la privada."],
+["san","salf",0,"29N","salf29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en castellano exigible en toda España y una selectividad única."],
+["san","vox",1,"29N","vox29","Ley estatal; la sanidad la gestionan las comunidades","Una tarjeta sanitaria única para toda España, sin exigir la lengua regional para trabajar en la sanidad."],
+["san","vox",0,"29N","vox29","Gestión autonómica","Un plan contra las listas de espera con colaboración público-privada."],
+["san","vox",0,"29N","vox29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en español, con un currículo y una selectividad únicos en toda España."],
+["san","vox",0,"29N","vox29","Ley orgánica","Derogar la LOMLOE, libre elección de centro y prohibir los móviles en clase."],
+["san","vox",0,"29N","vox29","Ley orgánica; su encaje con la igualdad del art. 14 de la Constitución es muy discutido","Fijar un máximo de alumnos de otras culturas por aula."],
+["inm","ara",1,"29N","fa29","Ley orgánica de extranjería","Un procedimiento permanente de regularización en la ley de extranjería y resolver toda la regularización de 2026."],
+["inm","ara",0,"29N","fa29","Ley orgánica y Gobierno","Cerrar los centros de internamiento de extranjeros (CIE) y derogar el «rechazo en frontera»."],
+["inm","ara",0,"29N","fa29","Gobierno","Cita en las oficinas de extranjería en siete días como máximo."],
+["inm","fo",1,"29N","fo29","Ley orgánica de extranjería","Expulsar a los inmigrantes en situación irregular y no regularizar nunca a quien entró de forma ilegal."],
+["inm","fo",0,"29N","fo29","Ley orgánica de extranjería y Código Civil","Retirar la nacionalidad a quien la obtuvo y comete un delito grave, y revisar las concedidas en los últimos veinte años."],
+["inm","fo",0,"29N","fo29","Ley estatal; afecta a la libertad religiosa (art. 16)","Expulsar a los radicales islámicos, sacar el islam de la escuela pública y no subvencionar sus entidades."],
+["inm","pcte",1,"L","pcteP","Gobierno y ley de extranjería","Cerrar los centros de internamiento de extranjeros."],
+["inm","pcte",0,"L","pcteP","Ley orgánica de extranjería","Plenos derechos para todas las personas que viven y trabajan en España, tengan o no papeles."],
+["inm","pp",1,"29N","pp29","Ley de extranjería y acuerdos con países de origen","Identificar en siete días a quien entre de forma irregular y devolverlo sin demora."],
+["inm","pp",0,"29N","pp29","Ley orgánica de extranjería","Prohibir por ley las regularizaciones masivas de inmigrantes."],
+["inm","pp",0,"29N","pp29","Gobierno, por ley","Cupos anuales de inmigración por sectores, según el paro y la capacidad en vivienda y servicios."],
+["inm","pp",0,"29N","pp29","Ley estatal","Prohibir el burka y el niqab en los espacios públicos."],
+["inm","psoe",1,"29N","psoe29","Gobierno y Presupuestos (500 M€ iniciales)","Un plan de integración de 500 millones y más vías legales y seguras de asilo y refugio."],
+["inm","psoe",0,"29N","psoe29","Gobierno y UE","Una política migratoria europea que combine la lucha contra las mafias con vías legales según las necesidades de empleo."],
+["inm","psoe",0,"29N","psoe29","Gobierno","Más contratación en origen y homologación más rápida de los títulos de quien viene a trabajar."],
+["inm","salf",1,"29N","salf29","Ley orgánica de extranjería; depende de que los países de origen readmitan","Ejecutar las órdenes de expulsión en 48 horas y anular la regularización extraordinaria de 2026."],
+["inm","salf",0,"29N","salf29","Gobierno y visados; parte depende de la UE","Paralizar la inmigración de los países que no readmitan a sus nacionales ni colaboren contra las mafias."],
+["inm","salf",0,"29N","salf29","Ley orgánica; afecta a la libertad religiosa (art. 16)","Ilegalizar a los Hermanos Musulmanes y prohibir la financiación extranjera de las mezquitas."],
+["inm","salf",0,"29N","salf29","Ley estatal; su encaje con el art. 14 de la Constitución está discutido","Ninguna ayuda social ni vivienda pública sin 5 años de residencia legal y cotización."],
+["inm","salf",0,"29N","salf29","Ley orgánica; afecta a la libertad religiosa (art. 16)","Prohibir el burka y el nicab en el espacio público."],
+["inm","vox",1,"29N","vox29","Ley orgánica de extranjería","Prohibir las regularizaciones y suprimir el arraigo: quien entre de forma ilegal no podrá regularizarse nunca."],
+["inm","vox",0,"29N","vox29","Ley orgánica de extranjería; «imponer costumbres ajenas» no es hoy causa legal de expulsión","Deportar a los extranjeros que cometan delitos graves o pretendan imponer costumbres ajenas."],
+["inm","vox",0,"29N","vox29","Depende de acuerdos con los países de origen; no se detalla cómo","«Remigración» de los extranjeros que vivan de subsidios."],
+["inm","vox",0,"29N","vox29","Ley estatal y convenios internacionales sobre la infancia","Devolver a sus familias y países a los menores extranjeros que llegan solos."],
+["inm","vox",0,"29N","vox29","Ley estatal; su encaje con el art. 14 de la Constitución y el Derecho de la UE está discutido","Ingreso mínimo vital solo para españoles, sanidad para irregulares solo en urgencia grave y un impuesto a las remesas."],
+["seg","ara",1,"29N","fa29","Ley orgánica","Derogar por completo la «ley mordaza» de 2015."],
+["seg","ara",0,"P23","faPC","Ley orgánica (Código Penal)","Eliminar la prisión permanente revisable y priorizar la reinserción."],
+["seg","fo",1,"29N","fo29","Ley orgánica (Código Penal)","Penas altas de cárcel para narcotraficantes y mafias de la inmigración."],
+["seg","fo",0,"29N","fo29","Exigiría reformar los estatutos de autonomía","Suprimir las policías autonómicas."],
+["seg","pcte",1,"L","pcteP","Ley orgánica","Acabar con la ley de seguridad ciudadana de 2015, que considera usada para reprimir protestas."],
+["seg","pcte",0,"L","pcteP","Ley estatal y comunidades","Cerrar las casas de apuestas."],
+["seg","pp",1,"29N","pp29","Ley orgánica (Código Penal)","Ampliar la prisión permanente revisable a delincuentes sexuales reincidentes y a quien oculte el cadáver de su víctima."],
+["seg","pp",0,"29N","pp29","Ley orgánica (Código Penal)","Una multa mínima de 3.000 € por vandalismo."],
+["seg","pp",0,"29N","pp29","Ley estatal","Reconocer a policías y guardias civiles como profesión de riesgo."],
+["seg","pp",0,"P23","ppPC","Ya vigente","Mantener la ley de seguridad ciudadana de 2015 y reforzar la autoridad de los agentes."],
+["seg","psoe",1,"29N","psoe29","Gobierno y Presupuestos","Más policías y guardias civiles, repartidos según población y jubilaciones, con más patrullas de proximidad."],
+["seg","psoe",0,"29N","psoe29","Ley orgánica","Una nueva ley de seguridad ciudadana que sustituya a la de 2015, con cámaras corporales en Policía y Guardia Civil."],
+["seg","psoe",0,"29N","psoe29","Ley estatal y Presupuestos","Ampliar los derechos profesionales de la Policía Nacional y la Guardia Civil."],
+["seg","salf",1,"29N","salf29","Ley orgánica penitenciaria y Presupuestos (unos 3.000 M€ de obra según el partido)","Una macrocárcel de máxima seguridad, sin permisos ni tercer grado, para asesinos, violadores, narcos y corruptos."],
+["seg","salf",0,"29N","salf29","Ley orgánica (Código Penal)","Presumir por ley la legítima defensa en casa o en el negocio, también con armas legales."],
+["seg","salf",0,"29N","salf29","Ley estatal y Presupuestos","Mismo sueldo para Guardia Civil y Policía Nacional que para los Mossos, y jubilación a los 60."],
+["seg","salf",0,"29N","salf29","Presupuestos (unos 1.200 M€ al año según el partido)","Una mili voluntaria pagada con 1.600 € al mes y ventajas fiscales para quien la haga."],
+["seg","salf",0,"29N","salf29","Ley orgánica penitenciaria","Registro público de agresores sexuales reincidentes y castración química voluntaria para obtener beneficios penitenciarios."],
+["seg","vox",1,"29N","vox29","Ley orgánica (Código Penal y ley del menor)","Ampliar la prisión permanente revisable y bajar la edad penal."],
+["seg","vox",0,"29N","vox29","Ley estatal y Presupuestos","Igualar el sueldo de Guardia Civil y Policía Nacional y reconocerlas como profesión de riesgo."],
+["seg","vox",0,"29N","vox29","Gobierno; las Fuerzas Armadas no tienen hoy funciones policiales en frontera","Desplegar las Fuerzas Armadas en las fronteras."],
+["jus","ara",1,"29N","fa29","Ley orgánica y Presupuestos","Un plan para alcanzar en dos legislaturas la media europea de jueces y fiscales por habitante."],
+["jus","ara",0,"29N","fa29","Ley orgánica","Reformar la ley para que ningún partido pueda bloquear la renovación del Consejo General del Poder Judicial."],
+["jus","ara",0,"29N","fa29","Ley orgánica","Incompatibilidad total de los jueces con cualquier otra actividad pagada."],
+["jus","fo",1,"29N","fo29","Ley orgánica","Que el Gobierno deje de elegir a miembros de órganos judiciales y priorizar a la carrera judicial en los tribunales superiores."],
+["jus","pp",1,"29N","pp29","Ley orgánica del Poder Judicial","Que los jueces elijan directamente a los doce vocales judiciales del Consejo General del Poder Judicial."],
+["jus","pp",0,"29N","pp29","Ley orgánica","Fiscal general con mandato único de cinco años y cese automático si es procesado."],
+["jus","pp",0,"29N","pp29","Ley orgánica","Que los jueces y fiscales que ocupen un cargo político esperen cinco años antes de volver a juzgar o acusar."],
+["jus","pp",0,"29N","pp29","Ley orgánica del Tribunal Constitucional","Que el Constitucional resuelva en 90 días los recursos sobre derechos fundamentales."],
+["jus","psoe",1,"29N","psoe29","Ley orgánica y Presupuestos","Más jueces y fiscales y acabar con el abuso de los sustitutos temporales."],
+["jus","psoe",0,"29N","psoe29","Ley orgánica y Presupuestos","Juzgados especializados en violencia contra la infancia."],
+["jus","salf",1,"29N","salf29","Presupuestos (unos 400 M€ al año según el partido) y ley procesal","2.000 jueces y 1.500 fiscales más, y juicios en 72 horas para multirreincidentes y delitos flagrantes."],
+["jus","salf",0,"29N","salf29","Reforma constitucional (Título IX)","Suprimir el Tribunal Constitucional y pasar sus funciones a una sala del Supremo elegida por los jueces."],
+["jus","salf",0,"29N","salf29","Ley estatal; hoy lo propone el Gobierno","Fiscal general elegido por tres quintos del Congreso para seis años."],
+["jus","vox",1,"29N","vox29","Ley orgánica del Poder Judicial (art. 122 de la Constitución)","Que los 12 vocales jueces del Consejo General del Poder Judicial los elijan los propios jueces."],
+["jus","vox",0,"29N","vox29","Exigiría reformar la Constitución (Título IX)","Sacar el Tribunal Constitucional del control de los políticos y evitar que actúe por encima del Supremo."],
+["cor","ara",1,"29N","fa29","Ley estatal","Una oficina independiente contra la corrupción con capacidad para investigar y sancionar."],
+["cor","ara",0,"29N","fa29","Ley estatal","Prohibir contratar con la Administración a las empresas implicadas en tramas de corrupción juzgadas."],
+["cor","ara",0,"29N","fa29","Ley estatal","Una ley de grupos de presión que haga públicas sus reuniones con cargos públicos."],
+["cor","fo",1,"29N","fo29","Ley orgánica (Código Penal)","Penas más altas por corrupción, también para los partidos como personas jurídicas, y prohibir indultarla."],
+["cor","fo",0,"29N","fo29","Gobierno y Presupuestos","Suprimir subvenciones que considera ideológicas y cargos duplicados."],
+["cor","pcte",1,"L","pcteP","Choca con el art. 67.2 de la Constitución (prohibición de mandato imperativo)","Que todos los cargos electos puedan ser revocados por sus votantes."],
+["cor","pcte",0,"L","pcteP","Ley estatal","Que los cargos públicos rindan cuentas ante asambleas de trabajadores y vecinos de su ámbito."],
+["cor","pp",1,"29N","pp29","Ley estatal (ley del indulto)","Prohibir el indulto a condenados por corrupción, terrorismo o delitos contra la integridad territorial."],
+["cor","pp",0,"29N","pp29","Ley orgánica (Código Penal)","Recuperar las penas por malversación anteriores a su última reforma."],
+["cor","pp",0,"29N","pp29","Discutido si basta una ley o hace falta reformar la Constitución (art. 115)","Convocar elecciones de forma obligatoria si se prorrogan los Presupuestos dos años seguidos."],
+["cor","pp",0,"29N","pp29","Gobierno","Una auditoría de todo el gasto público en los primeros cien días, con menos ministerios y altos cargos."],
+["cor","psoe",1,"29N","psoe29","Ley orgánica","Una ley de integridad pública con una agencia independiente anticorrupción y más protección para quien denuncia."],
+["cor","psoe",0,"29N","psoe29","Ley estatal","Una ley de grupos de presión con registro obligatorio y publicidad de sus reuniones."],
+["cor","psoe",0,"29N","psoe29","Reforma constitucional y de los estatutos","Quitar el aforamiento a los cargos públicos para los delitos ajenos a su cargo."],
+["cor","salf",1,"29N","salf29","Ley orgánica (Código Penal)","Que la corrupción no prescriba, sin indultos ni tercer grado, y que el condenado devuelva el triple."],
+["cor","salf",0,"29N","salf29","Ley estatal","Que quien denuncie corrupción cobre el 15 % de lo recuperado."],
+["cor","salf",0,"29N","salf29","Reforma constitucional","Acabar con los aforamientos."],
+["cor","salf",0,"29N","salf29","Gobierno","Pasar de 22 a 10 ministerios y de 1.255 a 400 asesores."],
+["cor","vox",1,"29N","vox29","Ley orgánica (Código Penal)","Prohibir los indultos por corrupción, castigar más la malversación y recuperar el delito de sedición."],
+["cor","vox",0,"29N","vox29","Ley estatal y Presupuestos","Auditar y eliminar las subvenciones a partidos, sindicatos, patronales y ONG."],
+["cor","vox",0,"29N","vox29","Ley estatal","Que los condenados por corrupción respondan con su patrimonio por el daño causado."],
+["cor","vox",0,"29N","vox29","Ley orgánica de partidos; el Constitucional solo admite ilegalizar por conductas, no por ideas","Ilegalizar los partidos que atenten contra la unidad de España."],
+["cor","vox",0,"29N","vox29","Ley estatal","Derogar la Ley de Memoria Democrática."],
+["igu","ara",1,"29N","fa29","Ley orgánica electoral","Listas electorales en cremallera como mínimo, permitiendo varias mujeres seguidas en puestos de salida."],
+["igu","ara",0,"29N","fa29","Ley orgánica y medios judiciales","Juzgados de violencia sobre la mujer realmente especializados."],
+["igu","ara",0,"29N","fa29","Ley estatal","Desarrollar la ley trans y reconocer las identidades no binarias."],
+["igu","ara",0,"29N","fa29","Ley estatal","Eliminar las normas que sancionan a las personas que ejercen la prostitución."],
+["igu","fo",1,"29N","fo29","Ley orgánica","Derogar las leyes de discriminación positiva, incluidas las cuotas, al considerar que la violencia contra las mujeres no es estructural."],
+["igu","fo",0,"29N","fo29","Gobierno","Suprimir el Ministerio de Igualdad."],
+["igu","fo",0,"29N","fo29","Ley estatal","Derogar la ley trans."],
+["igu","pcte",1,"L","pcteP","Presupuestos y ley","Más medios reales de seguimiento y protección para las víctimas de violencia machista y sus hijos."],
+["igu","pcte",0,"L","pcteP","Ley estatal","Igualdad salarial plena y servicios públicos que asuman las tareas de cuidado."],
+["igu","pcte",0,"L","pcteP","Ley orgánica (Código Penal)","Prohibir la prostitución, con planes de inserción laboral para las mujeres afectadas."],
+["igu","pp",1,"29N","ppPC","Presupuestos y ley orgánica","Reforzar la protección de las víctimas de violencia de género, con más medios en unidades y juzgados especializados."],
+["igu","pp",0,"29N","ppPC","Ley orgánica","Una ley integral contra la trata de personas."],
+["igu","pp",0,"29N","pp29","Ley estatal","Revisar la ley trans para que el cambio de sexo en el registro no dependa solo de la declaración de la persona."],
+["igu","pp",0,"29N","pp29","Ley del deporte","Usar el sexo biológico como criterio en las categorías deportivas femeninas."],
+["igu","psoe",1,"29N","psoe29","Ley orgánica","Incluir las violencias digitales en la ley integral contra la violencia de género."],
+["igu","psoe",0,"29N","psoe29","Ley estatal y Presupuestos","Ampliar la protección a los huérfanos de la violencia de género."],
+["igu","psoe",0,"29N","psoe29","Ley orgánica de educación","Coeducación y educación afectivo-sexual obligatorias en todas las etapas."],
+["igu","psoe",0,"29N","psoe29","Ley orgánica","Reforzar el cumplimiento de la ley de paridad."],
+["igu","salf",1,"A26","salfPC","Código Civil (ley estatal)","Custodia compartida como opción preferente tras la separación."],
+["igu","salf",0,"A26","salfPC","Cartera de servicios del sistema de salud","Retirar de la sanidad pública las operaciones y tratamientos de cambio de sexo."],
+["igu","salf",0,"29N","salf29","Ley estatal y sistema de salud","Prueba de paternidad gratuita al nacer, salvo que los dos progenitores renuncien."],
+["igu","vox",1,"29N","vox29","Leyes orgánicas y estatales","Derogar las leyes de género."],
+["igu","vox",0,"P23","voxPC","Ley orgánica","Derogar la ley de violencia de género, suprimir sus juzgados especializados y aprobar una ley de violencia doméstica sin distinción de sexo."],
+["igu","vox",0,"P23","voxPC","Ley estatal","Derogar la ley trans."],
+["vid","ara",1,"29N","fa29","Reforma constitucional (art. 43, procedimiento ordinario)","Incluir el derecho al aborto en el artículo 43 de la Constitución y garantizarlo en centros públicos de todas las comunidades."],
+["vid","ara",0,"P23","faPC","Ya vigente","Mantener la ley de eutanasia y extender los cuidados paliativos a domicilio."],
+["vid","pcte",1,"L","pcteP","Ley estatal","Pleno respeto a los derechos sexuales y reproductivos y permisos de nacimiento más largos."],
+["vid","pp",1,"P23","ppPC","Ley orgánica (requisito suprimido en 2023)","Exigir el consentimiento de los padres para que aborte una menor de edad, manteniendo la ley de plazos."],
+["vid","pp",0,"P23","ppPC","Ley orgánica","Revisar la ley de eutanasia con el criterio del Comité de Bioética y reforzar los cuidados paliativos."],
+["vid","psoe",1,"29N","psoe29","Reforma constitucional (art. 43, procedimiento ordinario: tres quintos de ambas cámaras)","Blindar el aborto en la Constitución reformando el artículo 43."],
+["vid","psoe",0,"29N","psoe29","Ya vigente; aplicación autonómica","Garantizar el acceso a la eutanasia según la ley vigente."],
+["vid","salf",1,"A26","salfPC","Presupuestos","Ayudas para que ninguna mujer embarazada aborte por motivos económicos."],
+["vid","vox",1,"29N","vox29","Ley estatal y comunidades","Defender la vida desde la concepción, con objeción de conciencia para los sanitarios y más cuidados paliativos."],
+["vid","vox",0,"D","voxPC","Ley orgánica","Derogar la ley de plazos del aborto y volver a una ley de supuestos."],
+["vid","vox",0,"P23","voxPC","Ley orgánica","Derogar la ley de eutanasia y aprobar una ley de cuidados paliativos."],
+["ene","ara",1,"29N","fa29","Gobierno y eléctricas","Cumplir el calendario de cierre nuclear: Almaraz cerraría en 2027-2028."],
+["ene","ara",0,"29N","fa29","Ley estatal y Presupuestos","Placas solares obligatorias y pagadas por el Estado en todas las comunidades de vecinos con tejado útil antes de 2030."],
+["ene","ara",0,"29N","fa29","Ley estatal","Cambiar el bono social por una tarifa social de la energía que se conceda de oficio."],
+["ene","fo",1,"29N","fo29","Gobierno y Consejo de Seguridad Nuclear","Ampliar el parque nuclear y explotar el uranio nacional."],
+["ene","fo",0,"29N","fo29","Ley estatal","Regular de inmediato el precio de la luz y los combustibles."],
+["ene","fo",0,"29N","fo29","Ley estatal; buena parte de la política climática es europea","Poner fin a la transición ecológica."],
+["ene","pcte",1,"L","pcteP","Ley estatal con indemnización (arts. 33 y 128 de la Constitución)","Pasar las empresas eléctricas y energéticas a propiedad pública bajo control de sus trabajadores."],
+["ene","pp",1,"29N","pp29","Gobierno, aval del Consejo de Seguridad Nuclear y decisión de las eléctricas propietarias","Anular el calendario de cierre de las centrales nucleares en los primeros cien días."],
+["ene","pp",0,"29N","pp29","Ley estatal","Suprimir el impuesto del 7 % a la producción de electricidad."],
+["ene","pp",0,"29N","pp29","Gobierno y operador de la red","Un plan para prevenir apagones."],
+["ene","psoe",1,"29N","psoe29","Gobierno y eléctricas","Mantener el calendario de cierre de las centrales nucleares hasta 2035."],
+["ene","psoe",0,"29N","psoe29","Gobierno y planificación eléctrica","Llegar al 81 % de electricidad renovable en 2030."],
+["ene","psoe",0,"29N","psoe29","Gobierno y Red Eléctrica","Reforzar las redes eléctricas para electrificar la industria."],
+["ene","salf",1,"29N","salf29","Ley estatal, dentro de la directiva europea del IVA (unos 2.600 M€ al año según el partido)","IVA del 4 % para la luz y el agua y suprimir el impuesto a la producción eléctrica."],
+["ene","salf",0,"A26","salfPC","Gobierno, Consejo de Seguridad Nuclear y eléctricas","Paralizar el cierre nuclear y atraer pequeños reactores modulares."],
+["ene","vox",1,"29N","vox29","Ley estatal; parte de los cargos de la factura dependen de normas europeas","Una bajada masiva de los impuestos de la electricidad."],
+["ene","vox",0,"29N","vox29","Gobierno, Consejo de Seguridad Nuclear y eléctricas","Anular el calendario de cierre de las nucleares y estudiar nuevas centrales junto a las actuales."],
+["ene","vox",0,"29N","vox29","Depende de la UE","Revertir la prohibición de vender coches de combustión y los impuestos al CO2."],
+["ter","ara",1,"C26","araCand","Ley estatal","Financiación justa para Baleares y aplicar de verdad su régimen especial."],
+["ter","ara",0,"C26","araCand","Estado (Aena)","Que Baleares participe en la gestión de sus aeropuertos."],
+["ter","ara",0,"C26","araCand","Estado, comunidad y consells","Frenar la masificación turística."],
+["ter","ara",0,"29N","fa29","Ley estatal y Presupuestos","Mantener indefinidamente el régimen especial de Baleares y las ayudas al transporte, y mejorar el plus de residencia de los empleados públicos estatales."],
+["ter","ara",0,"29N","fa29","Comunidades y consells; el Estado fija bases","Limitar plazas turísticas en zonas tensionadas según la capacidad del territorio."],
+["ter","fo",1,"29N","fo29","Reforma constitucional y de estatutos","Que todas las comunidades tengan las mismas competencias y devolver al Estado la sanidad, la educación y las emergencias."],
+["ter","fo",0,"29N","fo29","Comunidades y ayuntamientos","Frenar el turismo que considera destructivo."],
+["ter","pcte",1,"L","pcteP","Estado y comunidades","Una red de transporte público pensada para la población y no para la industria turística."],
+["ter","pp",1,"29N","pp29","Ley orgánica de financiación y Consejo de Política Fiscal","Un nuevo modelo de financiación autonómica pactado entre todas las comunidades, sin acuerdos bilaterales."],
+["ter","pp",0,"29N","pp29","Presupuestos de varias legislaturas","Un plan de infraestructuras de más de 300.000 millones en quince años."],
+["ter","pp",0,"29N","ppPC","Ley estatal; los objetivos de emisiones también los fija la UE","Mantener la descarbonización pero revisar los calendarios que considera inasumibles."],
+["ter","pp",0,"D","ppPC","Comunidades y ayuntamientos","Que los pisos turísticos los regulen solo comunidades y ayuntamientos."],
+["ter","psoe",1,"29N","psoe29","Ley orgánica de financiación","Aprobar el nuevo sistema de financiación autonómica propuesto por el Gobierno."],
+["ter","psoe",0,"29N","psoe29","Ley estatal y Presupuestos","Una ley de adaptación al cambio climático y un fondo nacional de resiliencia climática."],
+["ter","psoe",0,"29N","psoe29","Estado (costas) y comunidades","Adaptar la gestión del litoral al cambio climático."],
+["ter","salf",1,"29N","salf29","Ley orgánica de financiación","Financiación autonómica con criterios iguales para todas las comunidades y sin perdón de deudas."],
+["ter","salf",0,"29N","salf29","Reforma constitucional","Suprimir las diputaciones provinciales."],
+["ter","vox",1,"29N","vox29","Ley estatal y Presupuestos","Actualizar el complemento de insularidad de los empleados públicos estatales en Baleares y Canarias y mejorar la ayuda al transporte a la península."],
+["ter","vox",0,"P23","voxPC","Reforma constitucional del Título VIII","Avanzar hacia un Estado unitario."],
+["ter","vox",0,"P23","voxPC","Ley estatal y denuncia de un tratado internacional","Derogar la ley de cambio climático y abandonar el Acuerdo de París."],
+["ter","vox",0,"29N","vox29","Ley estatal y comunidades","Un plan nacional del agua que conecte las cuencas."],
+["ter","vox",0,"29N","vox29","Ley estatal; los ayuntamientos aplican las zonas","Acabar con las zonas de bajas emisiones y limitar las multas de tráfico."],
+["ext","ara",1,"29N","fa29","Presupuestos","Rechazar el objetivo de la OTAN del 5 % del PIB en gasto militar y reducirlo."],
+["ext","ara",0,"D","faPC","Gobierno","Romper relaciones con Israel y un embargo total de armas."],
+["ext","ara",0,"29N","fa29","Gobierno y Cortes (tratado internacional)","Firmar el tratado de prohibición de las armas nucleares y no permitir armas nucleares en España."],
+["ext","fo",1,"29N","fo29","Salida por el art. 50 del Tratado de la UE","Que España salga de la Unión Europea."],
+["ext","fo",0,"29N","fo29","Denuncia del Tratado del Atlántico Norte","Salir de la OTAN y cerrar las bases militares extranjeras, reforzando el ejército propio."],
+["ext","pcte",1,"L","pcteP","Salida por el art. 50 del Tratado de la UE","Salir de la Unión Europea y del euro."],
+["ext","pcte",0,"L","pcteP","Denuncia del Tratado del Atlántico Norte","Salir de la OTAN, cerrar las bases extranjeras y retirar las tropas de misiones internacionales."],
+["ext","pp",1,"C26","ppDef","Ley estatal y Presupuestos","Una ley de programación de la Defensa que priorice drones, defensa antiaérea y munición."],
+["ext","pp",0,"29N","pp29","Gobierno","Mantener el apoyo a Ucrania."],
+["ext","pp",0,"29N","ppPC","Gobierno y UE","Una UE con más fuerza política, económica y militar, que solo admita nuevos miembros que cumplan todos los requisitos."],
+["ext","psoe",1,"29N","psoe29","Gobierno y UE","Defender la solución de los dos Estados en Israel y Palestina y que la UE sancione a quien la obstaculice."],
+["ext","psoe",0,"29N","psoe29","Gobierno y UE","Impulsar una Unión Europea de la defensa con más autonomía militar europea."],
+["ext","psoe",0,"29N","psoe29","Gobierno y UE","Ampliar la Unión Europea a los Balcanes Occidentales."],
+["ext","salf",1,"29N","salf29","Referéndum consultivo (art. 92) y, en su caso, salida por el art. 50 del Tratado de la UE","Un referéndum para renegociar la relación con la UE y, si Bruselas se niega, otro para salir."],
+["ext","salf",0,"D","salfPC","Presupuestos","Rechazar el plan europeo de rearme."],
+["ext","salf",0,"29N","salf29","Consejo de la UE","Vetar el acuerdo con Mercosur, el recorte de la PAC y el Pacto Verde."],
+["ext","salf",0,"29N","salf29","Gobierno; la política comercial es competencia de la UE","Bloqueo comercial a Marruecos si bloquea un solo puerto español."],
+["ext","vox",1,"29N","vox29","Presupuestos","Más inversión en defensa, con mejores sueldos militares, y defender la soberanía frente a injerencias extranjeras."],
+["ext","vox",0,"D","voxPC","Gobierno","Revocar el reconocimiento del Estado palestino."],
+["ext","vox",0,"29N","vox29","Gobierno y negociación con el Reino Unido","Toda la presión internacional necesaria para recuperar la soberanía sobre Gibraltar."],
+["ext","vox",0,"29N","vox29","Política comercial común de la UE","Rechazar el acuerdo UE-Mercosur y defender al sector primario frente al Pacto Verde."]
+];
+const M=RAW.map((r,i)=>({id:"m"+i,tp:r[0],p:r[1],x:!!r[2],k:r[3],s:r[4],v:r[5],t:r[6]}));
+const byId=Object.fromEntries(M.map(m=>[m.id,m]));
+
+// Contraste: historial y coherencia (hechos con fuente, sin valoración)
+const RECORD={
+ ara:[
+  ["Sumar formó parte del Gobierno de 2023 a 2026; impulsó el decreto de renovación automática de los alquileres, que el Congreso tumbó en octubre de 2026.","faPC"],
+  ["Sumar no tiene casos de corrupción con juicio o procesamiento según el criterio común de Qué Proponen.","trib"],
+  ["En la legislatura pasada, el diputado de Més defendió en el Congreso la financiación de Baleares y limitar la compra de vivienda por no residentes.","araCand"],
+  ["En Baleares se presenta como Ara Més-Front Ampli: las medidas estatales salen del programa de Frente Amplio y las de las islas, de la campaña de Ara Més.","fa29"]
+ ],
+ fo:[
+  ["No tiene diputados ni historial de votaciones que contrastar; en las generales de 2023 obtuvo el 0,19 % de los votos.","foWiki"]
+ ],
+ pcte:[
+  ["No tiene diputados ni historial de votaciones que contrastar; en 2023 obtuvo en torno al 0,1 %.","pcteIA"],
+  ["Presenta su programa como un plan de oposición y lucha, no como un programa de gobierno.","pcteP"]
+ ],
+ pp:[
+  ["Caso Gürtel: en 2020 el Supremo confirmó que el partido se benefició de la trama y le ordenó devolver 245.492 €. Jaume Matas, expresidente balear, tiene condena firme. El juicio del caso Kitchen está pendiente de sentencia.","trib"],
+  ["Promete subir las pensiones con el IPC, algo que ya obliga una ley de 2021 contra la que votó.","ppPens"],
+  ["En 2024 pactó con el PSOE renovar el CGPJ manteniendo la elección parlamentaria que ahora propone cambiar.","psoePC"],
+  ["Apoyó en 2022 tramitar la ley abolicionista de la prostitución y votó en contra en 2024.","ppPC"],
+  ["Su programa no incluye memoria económica que calcule el coste de las rebajas de impuestos y las inversiones.","pp26"]
+ ],
+ psoe:[
+  ["El exministro José Luis Ábalos fue condenado en 2026 por el Supremo a 24 años por el caso mascarillas. Las condenas del caso ERE están pendientes de nuevas sentencias.","trib"],
+  ["Prometió derogar la ley de seguridad ciudadana y no lo hizo; ahora plantea reformarla.","psoePC"],
+  ["Aprobó la ley de amnistía en 2024 tras haber dicho en varias ocasiones que no la concedería.","psoeQP"],
+  ["Defiende el cierre nuclear, pero en agosto de 2026 prorrogó Almaraz hasta 2030.","psoePC"],
+  ["Sus decretos de vivienda decayeron en el Congreso en octubre de 2026, lo que llevó al adelanto electoral.","psoePC"]
+ ],
+ salf:[
+  ["Su líder, Alvise Pérez, está investigado en el Supremo por el supuesto cobro de 100.000 € para financiar la campaña europea de 2024; no hay condena.","salfV"],
+  ["Prometió donar su sueldo de eurodiputado por sorteo y, según El Independiente, no lo hizo con regularidad.","salfV"],
+  ["Su «contrato electoral» suma 81.700 M€ al año de rebajas y gasto y los cubre sobre todo con 57.000 M€ de ahorro en las comunidades autónomas, que no dependen del Gobierno central.","salf29"],
+  ["Promete bloquear el sueldo público de Alvise Pérez y perderlo si en 2030 sus votos no cumplen el 100 % de las 119 medidas.","salf29"]
+ ],
+ vox:[
+  ["Financió la campaña de 2023 con un préstamo de 6,5 millones de un banco húngaro; el Tribunal de Cuentas denunció que el banco no aportó la información que exige la ley.","voxQP"],
+  ["No tiene casos de corrupción con juicio o procesamiento según el criterio común de Qué Proponen.","trib"],
+  ["En 2024 dejó a la vez sus gobiernos autonómicos con el PP por el reparto de menores migrantes; en 2026 volvió a gobernar en cuatro comunidades.","voxQP"],
+  ["Su propuesta de preferencia nacional en vivienda fue rechazada en el Congreso, también por el PP. Nunca ha gobernado España.","voxQP"]
+ ]
+};
+
+// Pactos: hechos públicos, sin encuestas
+const BLOCS=[
+ {id:"right",n:"PP + Vox",p:["pp","vox"],facts:[["PP y Vox gobiernan en coalición en Extremadura, Aragón, Castilla y León y Andalucía desde 2026.","voxQP"],["Vox sostiene que cuanta más fuerza tenga, más podrá condicionar un Gobierno con el PP.","voxDem"]]},
+ {id:"left",n:"PSOE + Ara Més–Front Ampli",p:["psoe","ara"],facts:[["PSOE y Sumar gobernaron en coalición de 2023 a 2026 y van juntos al Senado en «Senado de Progreso».","faPC"],["La investidura de 2023 necesitó además a partidos nacionalistas e independentistas: salió con 179 votos.","inv"]]}
+];
+const OTHERS=[
+ ["SALF","Se presenta contra todos los partidos tradicionales. En Andalucía ofreció no presentarse si Vox aceptaba cinco condiciones suyas.","salfAnd"],
+ ["Frente Obrero","No ha planteado pactos de gobierno.","foPC"],
+ ["PCTE","Se presenta como oposición gane quien gane y descarta entrar en un Gobierno.","pcteP"]
+];
+// Resultado real de 2023 en Baleares (no es una encuesta)
+const SIM0=[["PP",35.6],["PSOE",30.2],["Ara Més–Front Ampli (en 2023, Més-Sumar)",16.6],["Vox",15.2],["SALF",0],["Frente Obrero",0],["PCTE",0]];
+
+/* ================= ESTADO ================= */
+const KEY="papeleta-ciegas-29n-v3";
+let S;
+function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function fresh(){const order={};TOPICS.forEach(t=>order[t.id]=shuffle(M.filter(m=>m.tp===t.id).map(m=>m.id)));return{view:"intro",ti:0,mode:"x",order,r:{},c:{},w:{},asks:{},cred:{},sim:SIM0.map(s=>s[1])}}
+S=load()||fresh();
+if(!S.cred)S.cred={};if(!S.sim)S.sim=SIM0.map(s=>s[1]);
+function deck(tp){return S.order[tp].filter(id=>S.mode==="all"||byId[id].x)}
+function activeMeasures(){return M.filter(m=>S.mode==="all"||m.x)}
+
+/* ================= CLAUDE ================= */
+let sampleFn=null;
+if(window.claude&&window.claude.use){window.claude.use("sample").then(s=>{sampleFn=s;if(S.view==="topic")render()}).catch(()=>{})}
+
+/* ================= UTILIDADES ================= */
+const $=s=>document.querySelector(s);
+function el(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==="class")e.className=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)e.setAttribute(k,v===true?"":v)}for(const k of kids.flat()){if(k==null||k===false)continue;e.append(k.nodeType?k:document.createTextNode(k))}return e}
+function srcLink(key){const s=SRC[key];return el("a",{href:s[1],target:"_blank",rel:"noopener"},s[0])}
+function toast(t){const x=$("#toast");x.textContent=t;x.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>x.hidden=true,2200)}
+const LABELS={"-2":"Muy en contra","-1":"En contra","0":"Indiferente","1":"A favor","2":"Muy a favor"};
+const WEIGHTS=[["0","No cuenta"],["0.5","Poco"],["1","Normal"],["2","Mucho"]];
+const CRED=[["1","Del todo"],["0.75","Bastante"],["0.5","Poco"],["0.25","Nada"]];
+function weight(t){return S.w[t]??1}
+function go(view,extra){Object.assign(S,{view},extra||{});save();render();scrollTo(0,0)}
+
+function header(){
+  const p=$("#prog");p.innerHTML="";
+  TOPICS.forEach((t,i)=>{const d=deck(t.id);const done=d.length&&d.every(id=>S.r[id]!==undefined);p.append(el("i",{class:(S.view==="topic"&&i===S.ti)?"cur":done?"done":""}))});
+  const act=activeMeasures();const n=act.filter(m=>S.r[m.id]!==undefined).length;$("#count").textContent=n+"/"+act.length;
+}
+
+/* ================= VISTAS ================= */
+function vIntro(){
+  const started=Object.keys(S.r).length>0;
+  const nx=M.filter(m=>m.x).length;
+  const modes=el("div",{class:"modes"},
+    el("button",{class:"mode","aria-pressed":String(S.mode==="x"),onclick:()=>{S.mode="x";save();render()}},el("b",{},`Exprés · ${nx} medidas`),el("span",{class:"muted"},"La propuesta principal de cada candidatura en cada tema. Unos 25 minutos.")),
+    el("button",{class:"mode","aria-pressed":String(S.mode==="all"),onclick:()=>{S.mode="all";save();render()}},el("b",{},`Completo · ${M.length} medidas`),el("span",{class:"muted"},"Todas las medidas recopiladas, una por tarjeta. Puedes pasar del exprés al completo sin perder lo hecho."))
+  );
+  return el("section",{class:"view"},
+    el("div",{class:"eyebrow"},"Elecciones generales · 29 de noviembre de 2026 · Congreso por Illes Balears"),
+    el("h1",{},"Lee las medidas sin saber de quién son"),
+    el("p",{class:"lead"},`Propuestas de las 7 candidaturas que se presentan al Congreso por Baleares, en ${TOPICS.length} temas, reescritas en tono neutro y barajadas. Puntúalas y al final se destapa de quién es cada una, con qué candidatura coincides, cuánto te crees a cada una y qué Gobierno podría salir.`),
+    modes,
+    el("div",{class:"panel steps"},
+      el("div",{},el("b",{},"Puntúa"),el("span",{class:"muted"},"De muy en contra a muy a favor. Puedes saltarte las que no entiendas.")),
+      el("div",{},el("b",{},"Pondera"),el("span",{class:"muted"},"Indica cuánto te importa cada tema.")),
+      el("div",{},el("b",{},"Contrasta"),el("span",{class:"muted"},"Cada medida dice quién la decidiría y si choca con la Constitución o la UE. Al final ves el historial de cada partido.")),
+      el("div",{},el("b",{},"Destapa"),el("span",{class:"muted"},"Afinidad, credibilidad, gobiernos posibles y reparto de escaños en Baleares."))
+    ),
+    el("div",{class:"chips"},TOPICS.map(t=>el("span",{class:"chip"},t.n))),
+    el("div",{class:"row"},
+      el("button",{class:"btn",onclick:()=>go("topic")},started?"Seguir donde lo dejé":"Empezar"),
+      started?el("button",{class:"btn ghost",onclick:()=>go("results")},"Ver resultado ahora"):null
+    ),
+    el("div",{class:"panel"},
+      el("h3",{},"Cómo se ha hecho"),
+      el("p",{class:"note"},`Actualizado el ${UPDATED}: casi todas las medidas salen ya de los programas del 29N. Ara Més no tiene programa estatal propio (se usa el de Frente Amplio y su campaña en Baleares) y el PCTE no ha publicado uno nuevo (se usa su programa de lucha 2023-2027). Cuando una medida viene de otra fuente se indica al destapar. Algunas candidaturas tienen muchas menos medidas que otras: su resultado es menos fiable.`),
+      el("p",{class:"note"},"Las respuestas se guardan solo en tu navegador; nadie más las ve. La página no recoge datos personales ni incluye encuestas.")
+    )
+  );
+}
+
+function askBox(m){
+  const id=m.id;const box=el("div",{class:"panel",style:"padding:12px"});
+  const out=el("div",{class:"ask",hidden:!S.asks[id]},el("span",{class:"who"},"Claude"),S.asks[id]||"");
+  const q=el("input",{type:"text",id:"q-"+id,placeholder:"Pregunta opcional: ¿cuánto costaría?, ¿me afecta como autónomo?…"});
+  let ctrl=null;
+  const btn=el("button",{class:"btn small ghost",onclick:async()=>{
+    if(!sampleFn){toast("Claude no está disponible en esta vista");return}
+    if(ctrl)ctrl.abort();ctrl=new AbortController();
+    out.hidden=false;out.lastChild.textContent="Pensando…";btn.disabled=true;
+    const extra=q.value.trim();
+    const prompt=`Eres un analista de políticas públicas neutral que ayuda a un votante de Baleares a valorar una medida electoral para las elecciones generales españolas del 29 de noviembre de 2026. Responde en español, en 120-170 palabras, en texto plano sin markdown ni viñetas.\n\nNORMA ESTRICTA: no digas, sugieras ni insinúes qué partido, candidatura o ideología la propone, ni uses expresiones asociadas a un partido. Si el votante lo pregunta, responde que el test es a ciegas.\n\nCubre: qué cambiaría en la práctica, quién tendría que aprobarlo (Estado, comunidades, UE, reforma constitucional), coste o viabilidad aproximados si se puede estimar, y el principal argumento a favor y el principal en contra.\n\nTema: ${TOPICS.find(t=>t.id===m.tp).n}\nMedida: ${m.t}\nQuién lo decide (nota del test): ${m.v}${extra?"\n\nPregunta del votante: "+extra:""}`;
+    try{
+      const r=await sampleFn(prompt,{signal:ctrl.signal,cache:false,onText:({text})=>{out.lastChild.textContent=text}});
+      S.asks[id]=r.text;out.lastChild.textContent=r.text;save();
+    }catch(e){
+      const c=e&&e.code;out.lastChild.textContent=c==="not_granted"?"Has denegado el acceso a Claude en esta página.":c==="rate_limited"?"Demasiadas preguntas seguidas. Espera un poco y vuelve a intentarlo.":"No se pudo obtener respuesta. Inténtalo de nuevo.";
+    }finally{btn.disabled=false}
+  }},"Preguntar a Claude");
+  box.append(q,el("div",{class:"row"},btn),out);
+  return box;
+}
+
+function card(m,i,n){
+  const id=m.id;const c=el("article",{class:"card"+(S.r[id]!==undefined?" rated":"")});
+  const scale=el("div",{class:"scale",role:"group","aria-label":"Tu valoración"});
+  ["-2","-1","0","1","2"].forEach(v=>{
+    scale.append(el("button",{"data-v":v,"aria-pressed":String(String(S.r[id])===v),onclick:()=>{
+      if(String(S.r[id])===v)delete S.r[id];else S.r[id]=Number(v);save();
+      scale.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(String(S.r[id])===b.dataset.v)));
+      c.classList.toggle("rated",S.r[id]!==undefined);header();
+    }},el("span",{class:"v"},(Number(v)>0?"+":"")+v),LABELS[v]));
+  });
+  const cm=el("textarea",{id:"c-"+id,placeholder:"Tu comentario (aparece al destapar)",hidden:!S.c[id]});
+  cm.value=S.c[id]||"";
+  cm.addEventListener("input",()=>{S.c[id]=cm.value;clearTimeout(cm.t);cm.t=setTimeout(save,400)});
+  const askWrap=el("div",{hidden:!S.asks[id]},askBox(m));
+  c.append(
+    el("div",{class:"num"},`MEDIDA ${i+1} DE ${n}`),
+    el("p",{class:"txt"},m.t),
+    el("div",{class:"who-decides"},el("b",{},"Quién lo decide"),el("span",{},m.v)),
+    scale,
+    el("div",{class:"tools"},
+      el("button",{class:"link",onclick:()=>{cm.hidden=!cm.hidden;if(!cm.hidden)cm.focus()}},"Comentar"),
+      sampleFn?el("button",{class:"link",onclick:()=>{askWrap.hidden=!askWrap.hidden}},"Pedir contexto a Claude"):null
+    ),
+    cm,askWrap
+  );
+  return c;
+}
+
+function vTopic(){
+  const t=TOPICS[S.ti];const ids=deck(t.id);
+  const seg=el("div",{class:"seg",role:"group","aria-label":"Importancia del tema"});
+  WEIGHTS.forEach(([v,l])=>seg.append(el("button",{"aria-pressed":String(String(weight(t.id))===v),onclick:()=>{S.w[t.id]=Number(v);save();seg.querySelectorAll("button").forEach((b,k)=>b.setAttribute("aria-pressed",String(WEIGHTS[k][0]===v)))}},l)));
+  const last=S.ti===TOPICS.length-1;
+  const missing=PKEYS.filter(p=>!M.some(m=>m.tp===t.id&&m.p===p));
+  return el("section",{class:"view"},
+    el("div",{class:"topic-head"},
+      el("div",{class:"eyebrow"},`Tema ${S.ti+1} de ${TOPICS.length} · modo ${S.mode==="x"?"exprés":"completo"}`),
+      el("h2",{},t.n),
+      el("div",{class:"weight"},el("span",{class:"muted"},"¿Cuánto pesa este tema en tu voto?"),seg)
+    ),
+    ids.map((id,i)=>card(byId[id],i,ids.length)),
+    el("p",{class:"note"},(S.mode==="x"?"En modo exprés cada tarjeta es de una candidatura distinta. ":"Varias tarjetas pueden ser de la misma candidatura. ")+(missing.length?`${missing.length} ${missing.length===1?"candidatura no tiene":"candidaturas no tienen"} propuesta localizable en este tema.`:"Las 7 candidaturas tienen propuestas en este tema.")),
+    el("div",{class:"nav"},
+      el("button",{class:"btn ghost",onclick:()=>{if(S.ti>0)go("topic",{ti:S.ti-1});else go("intro")}},S.ti>0?"← Tema anterior":"← Inicio"),
+      el("button",{class:"btn",onclick:()=>{if(last)go("results");else go("topic",{ti:S.ti+1})}},last?"Destapar resultado":"Siguiente tema →")
+    )
+  );
+}
+
+function compute(){
+  const res={};
+  for(const p of PKEYS)res[p]={num:0,den:0,n:0,tot:0,byT:{}};
+  activeMeasures().forEach(m=>{const R=res[m.p];R.tot++;const v=S.r[m.id];if(v===undefined)return;const w=weight(m.tp);R.n++;
+    const b=R.byT[m.tp]||(R.byT[m.tp]={sum:0,n:0});b.sum+=v;b.n++;if(w===0)return;R.num+=w*v;R.den+=w*2});
+  for(const p of PKEYS){const R=res[p];R.score=R.den?Math.round(R.num/R.den*100):null;const c=S.cred[p];R.cred=c===undefined?null:c;R.adj=R.score===null?null:Math.round(R.score*(R.cred??1))}
+  return res;
+}
+function blocScore(p){let num=0,den=0;activeMeasures().forEach(m=>{if(!p.includes(m.p))return;const v=S.r[m.id];const w=weight(m.tp);if(v===undefined||!w)return;num+=w*v*(S.cred[m.p]??1);den+=w*2});return den?Math.round(num/den*100):null}
+
+function pill(v){if(v===undefined)return el("span",{class:"score-pill p-na"},"Sin valorar");return el("span",{class:"score-pill "+(v>0?"p-pos":v<0?"p-neg":"p-0")},(v>0?"+":"")+v+" · "+LABELS[String(v)])}
+
+function bar(name,sub,sc,ghost){
+  const fill=el("div",{class:"fill"});const g=el("div",{class:"fill ghost"});
+  const put=(f,s)=>{const w=Math.abs(s)/2;f.style.width=w+"%";f.style.left=s>=0?"50%":(50-w)+"%";f.style.background=s>=0?"var(--pos)":"var(--neg)"};
+  if(sc!==null)put(fill,sc);
+  const track=el("div",{class:"track"});
+  if(ghost!=null&&ghost!==sc){put(g,ghost);track.append(g)}
+  track.append(fill);
+  return el("div",{class:"rk"},el("div",{class:"nm"},name,el("small",{},sub)),track,el("div",{class:"sc"},sc===null?"—":(sc>0?"+":"")+sc));
+}
+const axis=()=>el("div",{class:"axis"},el("span",{}),el("div",{},el("span",{},"−100"),el("span",{},"0"),el("span",{},"+100")),el("span",{}));
+
+function dhondt(shares,seats,thr){
+  const tot=shares.reduce((a,b)=>a+(+b||0),0)||1;const ok=shares.map(v=>(+v||0)>=thr);
+  const q=[];shares.forEach((v,i)=>{if(!ok[i]||!(+v))return;for(let d=1;d<=seats;d++)q.push({i,val:(+v)/d})});
+  q.sort((a,b)=>b.val-a.val);const out=shares.map(()=>0);q.slice(0,seats).forEach(x=>out[x.i]++);return out;
+}
+
+function summaryText(res,ranked){
+  let s=`Mi papeleta a ciegas 29N (Baleares, modo ${S.mode==="x"?"exprés":"completo"})\n\nAfinidad (−100 a +100) · credibilidad · ajustada:\n`;
+  ranked.forEach(p=>{const R=res[p];s+=`- ${PARTIES[p].n}: ${R.score===null?"sin datos":R.score} · ${R.cred===null?"sin valorar":CRED.find(c=>Number(c[0])===R.cred)[1].toLowerCase()} · ${R.adj===null?"-":R.adj} (${R.n}/${R.tot} medidas)\n`});
+  BLOCS.forEach(b=>{s+=`Bloque ${b.n}: ${blocScore(b.p)??"sin datos"}\n`});
+  s+="\nPeso de los temas: "+TOPICS.map(t=>`${t.n} ${WEIGHTS.find(w=>Number(w[0])===weight(t.id))[1].toLowerCase()}`).join("; ")+"\n";
+  TOPICS.forEach(t=>{s+=`\n## ${t.n}\n`;deck(t.id).forEach(id=>{const m=byId[id];const v=S.r[id];s+=`- ${PARTIES[m.p].n} [${v===undefined?"sin valorar":(v>0?"+":"")+v}]: ${m.t}${S.c[id]?"\n  Mi comentario: "+S.c[id]:""}\n`})});
+  return s;
+}
+
+function vResults(){
+  const res=compute();
+  const ranked=PKEYS.slice().sort((a,b)=>(res[b].adj??-999)-(res[a].adj??-999));
+  const act=activeMeasures();const nRated=act.filter(m=>S.r[m.id]!==undefined).length;
+
+  // 1. Afinidad
+  const rank=el("div",{class:"rank"},ranked.map(p=>{const R=res[p];return bar(PARTIES[p].n,`${R.n} de ${R.tot} medidas${R.cred!==null&&R.cred!==1?" · ajustada":""}`,R.adj,R.score)}),axis());
+
+  // 2. Credibilidad + historial
+  const credBoxes=PKEYS.map(p=>{
+    const seg=el("div",{class:"seg",role:"group","aria-label":"Credibilidad de "+PARTIES[p].n});
+    CRED.forEach(([v,l])=>seg.append(el("button",{"aria-pressed":String(S.cred[p]===Number(v)),onclick:()=>{if(S.cred[p]===Number(v))delete S.cred[p];else S.cred[p]=Number(v);save();render()}},l)));
+    return el("div",{class:"party-box"},
+      el("div",{class:"row",style:"justify-content:space-between"},el("span",{class:"pty"},PARTIES[p].n),el("span",{class:"muted",style:"font-size:12px"},PARTIES[p].f)),
+      el("ul",{class:"facts"},RECORD[p].map(([t,s])=>el("li",{},t," ",srcLink(s)))),
+      el("div",{class:"weight"},el("span",{class:"muted"},"¿Te crees que lo cumpla?"),seg));
+  });
+
+  // 3. Pactos
+  const blocBars=el("div",{class:"rank"},BLOCS.map(b=>bar(b.n,"si gobernaran juntos",blocScore(b.p))),axis());
+  const sim=el("div",{class:"sim"});
+  const seatsEls=[];
+  const redraw=()=>{const out=dhondt(S.sim,8,3);seatsEls.forEach((e,i)=>e.textContent=out[i]);const sum=S.sim.reduce((a,b)=>a+(+b||0),0);simTot.textContent=`Suma: ${sum.toFixed(1)} % (el resto, otras candidaturas y voto en blanco)`};
+  SIM0.forEach(([n],i)=>{const inp=el("input",{type:"number",min:"0",max:"100",step:"0.1",id:"sim"+i,"aria-label":"Porcentaje de "+n,value:String(S.sim[i])});
+    inp.addEventListener("input",()=>{S.sim[i]=parseFloat(inp.value)||0;save();redraw()});
+    const se=el("span",{class:"seats"},"0");seatsEls.push(se);sim.append(el("span",{},n),inp,se)});
+  const simTot=el("p",{class:"note"});
+  setTimeout(redraw,0);
+
+  // 4. Tabla por tema
+  const thead=el("tr",{},el("th",{},"Tema"),PKEYS.map(p=>el("th",{},PARTIES[p].n)));
+  const rows=TOPICS.map(t=>el("tr",{},el("td",{},t.n),PKEYS.map(p=>{const b=res[p].byT[t.id];const has=act.some(m=>m.tp===t.id&&m.p===p);
+    if(!has)return el("td",{class:"muted"},"·");if(!b)return el("td",{class:"muted"},"–");const a=b.sum/b.n;return el("td",{class:a>0?"cell-pos":a<0?"cell-neg":""},(a>0?"+":"")+a.toFixed(1))})));
+
+  // 5. Medidas destapadas
+  const reveal=TOPICS.map(t=>el("details",{},el("summary",{},t.n),
+    el("div",{class:"reveal"},deck(t.id).map((id,i)=>{const m=byId[id];
+      return el("div",{class:"rv"},
+        el("div",{class:"top"},el("span",{class:"pty"},`${i+1} · ${PARTIES[m.p].n}`),pill(S.r[id])),
+        el("p",{},m.t),
+        el("div",{class:"who-decides"},el("b",{},"Quién lo decide"),el("span",{},m.v)),
+        S.c[id]?el("div",{class:"cm"},"Tu comentario: "+S.c[id]):null,
+        el("div",{class:"row"},el("span",{class:"tag"},KIND[m.k]),srcLink(m.s)));
+    }))));
+
+  let confirmBox=null;
+  const resetBtn=el("button",{class:"btn ghost small",onclick:()=>{confirmBox.hidden=false}},"Borrar respuestas y volver a barajar");
+  confirmBox=el("div",{class:"confirm",hidden:true},el("span",{},"¿Seguro? Se borran puntuaciones, comentarios y credibilidad."),
+    el("button",{class:"btn small",onclick:()=>{S=fresh();save();render();scrollTo(0,0)}},"Sí, borrar"),
+    el("button",{class:"btn ghost small",onclick:()=>{confirmBox.hidden=true}},"Cancelar"));
+  const copyArea=el("div",{});
+  const copyBtn=el("button",{class:"btn small",onclick:()=>{const t=summaryText(res,ranked);
+    navigator.clipboard.writeText(t).then(()=>toast("Resumen copiado")).catch(()=>{const ta=el("textarea",{});ta.value=t;copyArea.replaceChildren(ta);ta.select();toast("Selecciona y copia el texto")})}},"Copiar mi resumen");
+
+  return el("section",{class:"view"},
+    el("div",{class:"eyebrow"},`Resultado · ${nRated} de ${act.length} medidas valoradas · modo ${S.mode==="x"?"exprés":"completo"}`),
+    el("h2",{},"Tu afinidad con cada candidatura"),
+    el("p",{class:"note"},"Cada puntuación (−2 a +2) se multiplica por el peso del tema. La afinidad es esa suma dividida por el máximo posible: +100 si apoyaste al máximo todo lo de una candidatura, −100 si lo rechazaste todo. Si valoras la credibilidad más abajo, la barra fuerte muestra la afinidad ajustada y la clara la original."),
+    nRated?el("div",{class:"panel"},rank):el("div",{class:"panel"},"Aún no has puntuado ninguna medida."),
+
+    el("h3",{},"¿Te lo crees? Historial de cada candidatura"),
+    el("p",{class:"note"},"Hechos con fuente sobre casos judiciales, promesas anteriores, contradicciones y experiencia de gobierno. Con ellos decide cuánto crees que cumpliría cada una: tu afinidad se multiplica por ese factor (del todo ×1, bastante ×0,75, poco ×0,5, nada ×0,25)."),
+    el("div",{class:"panel"},credBoxes),
+
+    el("h3",{},"Qué Gobierno podría salir"),
+    el("p",{class:"note"},"Ningún partido gobierna solo con los votos que se esperan. Esta es tu afinidad con las dos combinaciones que han gobernado o gobiernan juntas, ajustada por la credibilidad que hayas marcado."),
+    el("div",{class:"panel"},blocBars,
+      el("ul",{class:"facts"},BLOCS.flatMap(b=>b.facts).map(([t,s])=>el("li",{},t," ",srcLink(s))),OTHERS.map(([n,t,s])=>el("li",{},el("b",{},n+": "),t," ",srcLink(s))))),
+    el("h3",{},"Cómo se reparten los 8 escaños de Baleares"),
+    el("p",{class:"note"},"Votas una lista de Baleares y sus escaños se suman al Congreso. Se reparten por el método D'Hondt entre las listas con al menos el 3 % de los votos válidos. Con solo 8 escaños, en la práctica hace falta en torno a un 10 % para sacar uno. Los datos de partida son el resultado real de 2023, no una encuesta: cámbialos para ver qué pasaría."),
+    el("div",{class:"panel"},
+      el("div",{class:"sim"},el("span",{class:"eyebrow"},"Candidatura"),el("span",{class:"eyebrow",style:"text-align:right"},"% votos"),el("span",{class:"eyebrow",style:"text-align:right"},"Esc.")),
+      sim,simTot,
+      el("p",{class:"note"},"En 2023: PP 3, PSOE 3, Més-Sumar 1 y Vox 1. ",srcLink("bal23"))),
+    el("p",{class:"note"},"El Senado se vota en otra papeleta: en Mallorca puedes marcar hasta 3 candidatos, aunque sean de partidos distintos."),
+
+    el("h3",{},"Por tema"),
+    el("p",{class:"note"},"Media de tus puntuaciones (−2 a +2). «·»: sin medida en ese tema; «–»: no la valoraste."),
+    el("div",{class:"tablewrap"},el("table",{},el("thead",{},thead),el("tbody",{},rows))),
+
+    el("h3",{},"Las medidas destapadas"),
+    reveal,
+
+    el("div",{class:"row"},copyBtn,
+      el("button",{class:"btn ghost small",onclick:()=>go("topic",{ti:0})},"Revisar mis puntuaciones"),
+      S.mode==="x"?el("button",{class:"btn ghost small",onclick:()=>{S.mode="all";go("topic",{ti:0})}},"Pasar al modo completo"):null),
+    copyArea,
+    el("div",{class:"row"},resetBtn),confirmBox
+  );
+}
+
+function render(){
+  const app=$("#app");app.replaceChildren(S.view==="intro"?vIntro():S.view==="topic"?vTopic():vResults());header();
+}
+$("#home").addEventListener("click",()=>go("intro"));
+render();
+</script>
+
+</body>
+</html>
