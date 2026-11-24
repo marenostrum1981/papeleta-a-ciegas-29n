@@ -220,6 +220,7 @@ const TOPICS=[
  {id:"viv",n:"Vivienda"},
  {id:"eco",n:"Economía, impuestos y empleo"},
  {id:"pen",n:"Pensiones"},
+ {id:"fam",n:"Familia, natalidad y cuidados"},
  {id:"san",n:"Sanidad y educación"},
  {id:"inm",n:"Inmigración"},
  {id:"seg",n:"Seguridad ciudadana"},
@@ -229,6 +230,7 @@ const TOPICS=[
  {id:"vid",n:"Aborto y eutanasia"},
  {id:"ene",n:"Energía"},
  {id:"ter",n:"Territorio, turismo y medio ambiente"},
+ {id:"len",n:"Lengua y modelo territorial"},
  {id:"ext",n:"Exterior, defensa y Unión Europea"}
 ];
 // [tema, partido, exprés(1/0), tipo, fuente, quién lo decide / viabilidad, medida]
@@ -300,7 +302,6 @@ const RAW=[
 ["pen","pcte",1,"L","pcteP","Ley estatal; coste muy elevado no calculado","Adelantar la jubilación a los 60 años en general y a los 55 en trabajos especialmente duros."],
 ["pen","pp",1,"29N","ppPC","Ley estatal (ya vigente desde 2021)","Subir las pensiones cada año con el IPC y reconstruir el consenso del Pacto de Toledo."],
 ["pen","pp",0,"29N","ppPC","Ley estatal (IRPF)","Deducciones fiscales para quien siga trabajando después de la edad de jubilación."],
-["pen","pp",0,"29N","pp29","Ley estatal y Presupuestos","Que el Estado pague el 50 % del coste de la dependencia y una deducción del 40 % por contratar cuidados profesionales para un mayor dependiente."],
 ["pen","psoe",1,"29N","psoe29","Reforma constitucional (art. 50, procedimiento ordinario)","Blindar en la Constitución las pensiones públicas y su subida con el IPC."],
 ["pen","psoe",0,"29N","psoe29","Ley estatal y Presupuestos","Reducir la brecha de género en las pensiones."],
 ["pen","salf",1,"29N","salf29","Ley estatal; transición de décadas con doble coste (unos 6.000 M€ al año según el partido)","Sistema mixto: los menores de 45 años apartarían el 2 % del salario en una cuenta individual, suya y heredable."],
@@ -308,7 +309,26 @@ const RAW=[
 ["pen","salf",0,"29N","salf29","Ley estatal","Suprimir las ventajas en la pensión de los parlamentarios y las cesantías y escoltas vitalicios de los expresidentes."],
 ["pen","vox",1,"29N","vox29","Política económica general; el programa no concreta cambios en la ley de pensiones","Garantizar las pensiones con más empleo, mejores salarios y medidas de natalidad, sin detallar cambios en el sistema."],
 ["pen","vox",0,"C26","voxMon","Ley estatal; transición de décadas con doble coste","Pasar a un sistema mixto en el que el reparto actual conviva con cuentas de capitalización individual."],
-["pen","vox",0,"29N","vox29","Ley estatal (Seguridad Social) y Presupuestos","Que el Estado pague la cotización de quien deja de trabajar para cuidar a sus hijos, y escuela de 0 a 3 años gratis."],
+["fam","ara",1,"29N","fa29","Ley estatal y Presupuestos; para unos 8 millones de menores costaría unos 19.000 M€ al año (cálculo del test)","200 € al mes por cada menor de 18 años, sin depender de los ingresos de los padres."],
+["fam","ara",0,"29N","fa29","Presupuestos del Estado y de las comunidades","Subir el gasto en dependencia del 0,8 % al 1,7 % del PIB en 2030."],
+["fam","ara",0,"29N","fa29","Ley estatal; coste compartido al 50 % entre Estado y comunidades","Duplicar las horas de ayuda a domicilio y reconocer por ley un mes al año de respiro para quien cuida a un dependiente."],
+["fam","ara",0,"29N","fa29","Estado y comunidades","Universalizar la educación de 0 a 3 años."],
+["fam","fo",1,"29N","fo29","Ley estatal y Presupuestos","Planes estatales de natalidad, con más ventajas fiscales y ayudas cuantos más hijos se tengan."],
+["fam","fo",0,"29N","fo29","Estado y comunidades","Guarderías y escuelas infantiles públicas y gratuitas."],
+["fam","fo",0,"29N","fo29","Ley estatal","Bajas de maternidad y paternidad más largas y obligar a las empresas a facilitar teletrabajo y cambios de horario para conciliar."],
+["fam","pp",1,"29N","pp29","Acuerdo con las comunidades: el Estado pagaría la mitad de cada plaza","Escuela infantil de 0 a 3 años gratuita, pública o concertada, al terminar la legislatura."],
+["fam","pp",0,"29N","pp29","Ley estatal y Presupuestos","Que el Estado pague el 50 % del coste de la dependencia y una deducción del 40 % por contratar cuidados profesionales para un mayor dependiente."],
+["fam","pp",0,"29N","pp29","Ley estatal (IRPF)","Juntar las deducciones por hijo del IRPF en una sola que se cobre cada mes, aunque no se haga la declaración, y actualizar los mínimos familiares con la inflación."],
+["fam","pp",0,"29N","pp29","Ley estatal, con sindicatos y patronal","Más semanas de permiso por nacimiento y más libertad para organizarlas."],
+["fam","pp",0,"29N","pp29","Ley estatal","Incentivos a las empresas por los trabajadores con hijos pequeños y bolsas de horas para adaptar la jornada."],
+["fam","psoe",1,"29N","psoe29","Ley estatal y Presupuestos","Una prestación estatal por crianza para todos los hogares con menores, mayor para los de renta baja."],
+["fam","psoe",0,"29N","psoe29","Estado y comunidades","Universalizar la escuela de 0 a 3 años con más plazas públicas y menos alumnos por aula."],
+["fam","psoe",0,"29N","psoe29","Ley estatal (Seguridad Social)","Pagar al 100 % cuatro semanas del permiso parental para cuidar de hijos menores de ocho años."],
+["fam","psoe",0,"29N","psoe29","Presupuestos del Estado y de las comunidades","Aplicar la reforma de la dependencia de 2026 con financiación plurianual para seguir bajando las listas de espera."],
+["fam","psoe",0,"29N","psoe29","Ley estatal","Más protección social para quienes cuidan de forma continuada a un familiar."],
+["fam","vox",1,"29N","vox29","Ley estatal (Seguridad Social) y Presupuestos","Que el Estado pague la cotización de quien deja de trabajar para cuidar a sus hijos, y escuela de 0 a 3 años gratis."],
+["fam","vox",0,"29N","vox29","Presupuestos del Estado y de las comunidades","Más dinero para la dependencia, ayudas para cuidar en casa y más plazas en residencias."],
+["fam","vox",0,"29N","vox29","Ley estatal (IRPF e IVA)","Deducciones por material escolar y actividades extraescolares, y menos impuestos en los productos infantiles de primera necesidad."],
 ["san","ara",1,"29N","fa29","Presupuestos y ley estatal; la gestión es autonómica","Gasto sanitario público del 8 % del PIB y gestión pública directa como norma, revirtiendo privatizaciones."],
 ["san","ara",0,"29N","fa29","Ley estatal","Atención sanitaria universal para los residentes, sea cual sea su situación administrativa."],
 ["san","fo",1,"29N","fo29","Exigiría reformar los estatutos de autonomía","Acabar con la privatización de la sanidad y que el sistema de salud vuelva a ser estatal."],
@@ -316,20 +336,16 @@ const RAW=[
 ["san","pcte",1,"L","pcteP","Ley estatal y comunidades","Sacar a todas las empresas privadas de la sanidad, la educación y los servicios sociales."],
 ["san","pcte",0,"L","pcteP","Ley estatal y Presupuestos","Incluir el dentista completo en la sanidad pública."],
 ["san","pp",1,"29N","pp29","La sanidad la gestionan las comunidades; el Estado financia y forma especialistas","Incorporar al menos 4.500 médicos más en atención primaria."],
-["san","pp",0,"29N","pp29","Presupuestos y comunidades","Educación infantil de 0 a 3 años gratuita al final de la legislatura."],
 ["san","pp",0,"29N","pp29","Ley estatal con las comunidades","Una única prueba de acceso a la universidad para toda España."],
 ["san","pp",0,"29N","pp29","Ley estatal; aplicarla a plataformas extranjeras depende también de la UE","Prohibir las cuentas en redes sociales a menores de 14 años."],
 ["san","psoe",1,"29N","psoe29","Presupuestos del Estado y de las comunidades","Acabar con las listas de espera con un gasto sanitario público en torno al 7 % del PIB."],
 ["san","psoe",0,"29N","psoe29","Ley estatal; la gestión es autonómica","Que la gestión pública directa sea la forma preferente en la sanidad, limitando la privatización."],
-["san","psoe",0,"29N","psoe29","Estado y comunidades","Universalizar la escuela de 0 a 3 años con más plazas públicas y menos alumnos por aula."],
 ["san","salf",1,"29N","salf29","Gestión autonómica; coste según el partido: unos 1.500 M€ al año","Máximo de 60 días para operarse; si no, el paciente elige centro, público o privado, y paga la sanidad pública."],
 ["san","salf",0,"29N","salf29","Ley estatal; hoy cada comunidad compra por su cuenta","Una central de compras sanitaria única para toda España."],
 ["san","salf",0,"29N","salf29","Ley estatal; hoy la cobertura es universal para residentes","Tarjeta sanitaria solo para españoles y residentes legales con cotización o cobertura, con urgencias para todos."],
 ["san","salf",0,"29N","salf29","Estado y comunidades","Un cheque escolar del mismo importe para la pública, la concertada y la privada."],
-["san","salf",0,"29N","salf29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en castellano exigible en toda España y una selectividad única."],
-["san","vox",1,"29N","vox29","Ley estatal; la sanidad la gestionan las comunidades","Una tarjeta sanitaria única para toda España, sin exigir la lengua regional para trabajar en la sanidad."],
+["san","vox",1,"29N","vox29","Ley estatal; la sanidad la gestionan las comunidades","Una tarjeta sanitaria única con historia clínica compartida en toda España."],
 ["san","vox",0,"29N","vox29","Gestión autonómica","Un plan contra las listas de espera con colaboración público-privada."],
-["san","vox",0,"29N","vox29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en español, con un currículo y una selectividad únicos en toda España."],
 ["san","vox",0,"29N","vox29","Ley orgánica","Derogar la LOMLOE, libre elección de centro y prohibir los móviles en clase."],
 ["san","vox",0,"29N","vox29","Ley orgánica; su encaje con la igualdad del art. 14 de la Constitución es muy discutido","Fijar un máximo de alumnos de otras culturas por aula."],
 ["inm","ara",1,"29N","fa29","Ley orgánica de extranjería","Un procedimiento permanente de regularización en la ley de extranjería y resolver toda la regularización de 2026."],
@@ -487,10 +503,24 @@ const RAW=[
 ["ter","salf",1,"29N","salf29","Ley orgánica de financiación","Financiación autonómica con criterios iguales para todas las comunidades y sin perdón de deudas."],
 ["ter","salf",0,"29N","salf29","Reforma constitucional","Suprimir las diputaciones provinciales."],
 ["ter","vox",1,"29N","vox29","Ley estatal y Presupuestos","Actualizar el complemento de insularidad de los empleados públicos estatales en Baleares y Canarias y mejorar la ayuda al transporte a la península."],
-["ter","vox",0,"P23","voxPC","Reforma constitucional del Título VIII","Avanzar hacia un Estado unitario."],
 ["ter","vox",0,"P23","voxPC","Ley estatal y denuncia de un tratado internacional","Derogar la ley de cambio climático y abandonar el Acuerdo de París."],
 ["ter","vox",0,"29N","vox29","Ley estatal y comunidades","Un plan nacional del agua que conecte las cuencas."],
 ["ter","vox",0,"29N","vox29","Ley estatal; los ayuntamientos aplican las zonas","Acabar con las zonas de bajas emisiones y limitar las multas de tráfico."],
+["len","ara",1,"29N","fa29","Reforma constitucional agravada (art. 168): la Corona y la forma de Estado están en los títulos más protegidos","Avanzar hacia una república federal y plurinacional."],
+["len","ara",0,"29N","fa29","Estado y comunidades; el modelo lingüístico escolar lo regula cada comunidad, con límites fijados por los tribunales","Un plan estatal para aprender las lenguas cooficiales en toda España, garantizando la inmersión en catalán en Cataluña."],
+["len","fo",1,"29N","fo29","Reforma constitucional: los conciertos vasco y navarro están amparados por la Constitución","Que todas las comunidades tengan las mismas competencias y el mismo régimen fiscal, acabando con las diferencias entre regiones."],
+["len","fo",0,"29N","fo29","Reforma de estatutos y leyes orgánicas","Devolver al Estado la sanidad, la educación y los servicios de emergencia."],
+["len","fo",0,"29N","fo29","Ley orgánica de educación y comunidades","Derecho de todos a estudiar en castellano o en la lengua cooficial, acabando con el uso político de las lenguas."],
+["len","pp",1,"29N","pp29","Ley orgánica de educación; las comunidades organizan la enseñanza","Garantizar la enseñanza en castellano en todas las etapas y en toda España, respetando las lenguas cooficiales y cumpliendo las sentencias."],
+["len","pp",0,"29N","pp29","Ley estatal y leyes autonómicas","Que los requisitos de lengua cooficial respeten los derechos de todos y que cada ciudadano elija en qué lengua oficial le atiende la Administración."],
+["len","pp",0,"29N","pp29","Ley orgánica; derogarla no deshace las amnistías ya aplicadas","Derogar la Ley de Amnistía y prohibir que el indulto se use como moneda de cambio para formar Gobierno."],
+["len","psoe",1,"29N","psoe29","Reglamentos de las Cortes y ley estatal","Usar las lenguas cooficiales en las Cortes y en la atención de la Administración del Estado en las comunidades donde son oficiales."],
+["len","psoe",0,"29N","psoe29","Exige la unanimidad de los países de la UE","Seguir pidiendo que el catalán, el euskera y el gallego sean lenguas oficiales de la Unión Europea."],
+["len","salf",1,"29N","salf29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en castellano exigible en toda España y una selectividad única."],
+["len","salf",0,"29N","salf29","Reforma constitucional","Prohibir las amnistías en la Constitución y no conceder nunca indultos por motivos políticos."],
+["len","vox",1,"29N","vox29","Ley estatal; los requisitos de lengua para plazas autonómicas los fija cada comunidad","Que no saber la lengua regional no impida nunca opositar a una plaza de la sanidad pública."],
+["len","vox",0,"29N","vox29","Ley orgánica de educación; choca con los estatutos que regulan la lengua cooficial","Enseñanza en español, con un currículo y una selectividad únicos en toda España."],
+["len","vox",0,"P23","voxPC","Reforma constitucional del Título VIII","Avanzar hacia un Estado unitario."],
 ["ext","ara",1,"29N","fa29","Presupuestos","Rechazar el objetivo de la OTAN del 5 % del PIB en gasto militar y reducirlo."],
 ["ext","ara",0,"D","faPC","Gobierno","Romper relaciones con Israel y un embargo total de armas."],
 ["ext","ara",0,"29N","fa29","Gobierno y Cortes (tratado internacional)","Firmar el tratado de prohibición de las armas nucleares y no permitir armas nucleares en España."],
@@ -573,7 +603,7 @@ const OTHERS=[
 const SIM0=[["PP",35.6],["PSOE",30.2],["Ara Més–Front Ampli (en 2023, Més-Sumar)",16.6],["Vox",15.2],["SALF",0],["Frente Obrero",0],["PCTE",0]];
 
 /* ================= ESTADO ================= */
-const KEY="papeleta-ciegas-29n-v3";
+const KEY="papeleta-ciegas-29n-v4";
 let S;
 function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r)}catch(e){}return null}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -610,7 +640,7 @@ function vIntro(){
   const started=Object.keys(S.r).length>0;
   const nx=M.filter(m=>m.x).length;
   const modes=el("div",{class:"modes"},
-    el("button",{class:"mode","aria-pressed":String(S.mode==="x"),onclick:()=>{S.mode="x";save();render()}},el("b",{},`Exprés · ${nx} medidas`),el("span",{class:"muted"},"La propuesta principal de cada candidatura en cada tema. Unos 25 minutos.")),
+    el("button",{class:"mode","aria-pressed":String(S.mode==="x"),onclick:()=>{S.mode="x";save();render()}},el("b",{},`Exprés · ${nx} medidas`),el("span",{class:"muted"},"La propuesta principal de cada candidatura en cada tema. Unos 30 minutos.")),
     el("button",{class:"mode","aria-pressed":String(S.mode==="all"),onclick:()=>{S.mode="all";save();render()}},el("b",{},`Completo · ${M.length} medidas`),el("span",{class:"muted"},"Todas las medidas recopiladas, una por tarjeta. Puedes pasar del exprés al completo sin perder lo hecho."))
   );
   return el("section",{class:"view"},
